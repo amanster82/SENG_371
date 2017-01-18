@@ -20,6 +20,25 @@ Live reload is used in the development to speed up development time. CSS code is
 
 * `npm run dev` — Will run a BrowserSync server and open your browser to the dev page
 
+### Directory Layout
+
+The project is laid out as following:
+
+```
+.
+├── /node_modules/            # 3rd-party libraries and utilities
+├── /public/                  # Public folder served as the frontend application
+│   ├── /js/                  # Collection of frontend JavaScript code
+│   │   └── main.js           # Entry-point for frontend application logic
+│   ├── /css/                 # Collection of frontend CSS scripts
+│   │   ├── main.css          # Primary application style
+│   │   └── reset.css         # Normalize.css reset
+│   └── /index.html           # The static application page
+├── /server/                  # Backend application code
+│   └── /main.js              # Web-server
+└── package.json              # The list of 3rd party libraries and utilities
+```
+
 ### Linting
 Run one or the combination of commands to perform code linting
 
