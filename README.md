@@ -4,7 +4,7 @@ NexGen Milestone 1
 
 ## Usage
 ```
-$ git clone http://chrishampu@jira.seng.uvic.ca:8051/scm/nex/milestone-1.git
+$ git clone http://jira.seng.uvic.ca:8051/scm/nex/milestone-1.git
 $ npm install
 $ npm start
 ```
