@@ -12,6 +12,9 @@ Browse to http://localhost:3000 and begin using the application
 
 ## Development Guide
 
+### Requirements
+In order to run the API server, NodeJS V7.0.0 or higher is required with the '--harmony-async-await' flag. The 'npm start' command will use this flag by default.
+
 ### Run standalone server
 * `npm start` — Will run a Koa server that will serve the files in the 'public' folder
 
