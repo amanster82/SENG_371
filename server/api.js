@@ -6,17 +6,17 @@ const router = koaRouter();
 const mysql = require('./mysql');
 
 /**
- * Returns a boolean with whether the given object contains
+ * Returns a boolean with whether the given project object contains
  * all the fields necessary to facilitate a MySQL connection
  */
-function verifyProjectFields(fields) {
+function verifyProjectFields(project) {
 
-  if (!fields ||
-    !fields.connection_info ||
-    !fields.connection_info.host ||
-    !fields.connection_info.user ||
-    !fields.connection_info.password ||
-    !fields.connection_info.database) {
+  if (!project ||
+    !project.connection_info ||
+    !project.connection_info.host ||
+    !project.connection_info.user ||
+    !project.connection_info.password ||
+    !project.connection_info.database) {
     return false;
   }
 
