@@ -13,10 +13,10 @@ Browse to http://localhost:3000 and begin using the application
 ## Development Guide
 
 ### Requirements
-In order to run the API server, NodeJS V7.0.0 or higher is required with the '--harmony-async-await' flag. The 'npm start' command will use this flag by default.
+In order to run the standalone API server, NodeJS V7.0.0 or higher is required with the '--harmony-async-await' flag. The 'npm start' command will use this flag by default.
 
 ### Run standalone server
-* `npm start` — Will run a Koa server that will serve the files in the 'public' folder
+* `npm start` — Will run a Koa server that will serve the files in the 'public' folder as well as the API routes used by the frontend
 
 ### Live reload
 Live reload is used in the development to speed up development time. CSS code is injected into the page, while JS/HTML code will refresh the page.
@@ -38,7 +38,9 @@ The project is laid out as following:
 │   │   └── reset.css         # Normalize.css reset
 │   └── /index.html           # The static application page
 ├── /server/                  # Backend application code
-│   └── /main.js              # Web-server
+│   ├── api.js                # Koa router + API routes
+│   ├── mysql.js              # MySQL interface
+│   └── main.js               # API web-server
 └── package.json              # The list of 3rd party libraries and utilities
 ```
 
