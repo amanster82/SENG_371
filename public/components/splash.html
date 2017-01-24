@@ -87,13 +87,18 @@
         // This function will 'transition' from the splash page to the main project view
         root.querySelector('#transition').addEventListener('click', (e) => {
 
-          while (root.hasChildNodes()) {
-              root.removeChild(root.lastChild);
-          }
+          // Remove all the splash page elements before attaching the application
+          removeAllChildren(root);
 
+          /**
+            * This will create the 'ng-application' component imported at the top of this file
+            * and attach it to the root element
+            */
           root.appendChild(document.createElement('ng-application'));
         });
       }
     });
   })();
 </script>
+
+<script src="../js/utilities.js"></script>
