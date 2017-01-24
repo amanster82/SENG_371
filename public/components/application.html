@@ -19,30 +19,22 @@
     header > img {
       padding: 12px;
       vertical-align: middle;
-      margin-right: 10px;
     }
 
-    .button_con {
-      display: inline-block;
-      vertical-align: middle;
-      cursor: pointer;
-      padding: 6px 10px;
-      background-color: white;
-      transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+    .create_project {
+      float: right;
+      margin-top: 19px;
+      margin-right: 20px;
     }
 
-    .button_con:hover {
+    button {
+      color: #313131;
+      min-width: 156px;
+    }
+
+    button:hover {
       background-color: var(--background-teal);
-    }
-
-    .button_con:hover > .button_text {
       color: white;
-    }
-
-    .button_text {
-      text-transform: uppercase;
-      color: #616161;
-      transition: inherit;
     }
 
     .content {
@@ -96,7 +88,8 @@
     }
 
     .circ_button:hover {
-      background-color: var(--background-highlight);
+      background-color: var(--background-teal);
+      color: white;
     }
 
     .circ_button_text {
@@ -141,7 +134,7 @@
       display: flex;
     }
 
-    .proj_open > div {
+    .proj_open > button {
       margin: 0 auto;
     }
 
@@ -157,11 +150,9 @@
 
     <header>
       <img src="images/Logo.png" height="48px" width="48px"></img>
-      <div class=" button_con ">
-        <div class="button_text ">
-          Create Project
-        </div>
-      </div>
+      <button class="create_project">
+      Create Project
+      </button>
     </header>
     <div class="content ">
       <div class="content_container ">
@@ -195,11 +186,9 @@
                 </ul>
               </div>
               <div class="proj_open ">
-                <div class="button_con ">
-                  <div class="button_text ">
-                    Open Project
-                  </div>
-                </div>
+                <button>
+                  Open Project
+                </button>
               </div>
             </div>
           </div>
@@ -234,11 +223,9 @@
                 </ul>
               </div>
               <div class="proj_open ">
-                <div class="button_con ">
-                  <div class="button_text ">
-                    Open Project
-                  </div>
-                </div>
+                <button>
+                  Open Project
+                </button>
               </div>
             </div>
           </div>
@@ -273,11 +260,9 @@
                 </ul>
               </div>
               <div class="proj_open ">
-                <div class="button_con ">
-                  <div class="button_text ">
-                    Open Project
-                  </div>
-                </div>
+                <button>
+                  Open Project
+                </button>
               </div>
             </div>
           </div>
@@ -312,11 +297,9 @@
                 </ul>
               </div>
               <div class="proj_open ">
-                <div class="button_con ">
-                  <div class="button_text ">
-                    Open Project
-                  </div>
-                </div>
+                <button>
+                  Open Project
+                </button>
               </div>
             </div>
           </div>
