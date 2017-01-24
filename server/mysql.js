@@ -68,6 +68,7 @@ async function promisifyQuery(connection, query) {
 /**
  * This function will perform database analysis and
  * return an object which follows the documented schema json structure
+ * For data structure see: http://jira.seng.uvic.ca:8060/display/NEX/Data+Structures
  */
 async function extractSchema(project) {
 
@@ -98,7 +99,10 @@ async function extractSchema(project) {
     const columns = [];
     const relationships = [];
 
-    // Given a table name, we request a data structure that represents all of the columns in the table
+    /** 
+     * Given a table name, we request a data structure that represents
+     * all of the columns in the table
+     */
     const column_query = await promisifyQuery(connection, `show columns from ${table_name}`); // eslint-disable-line no-await-in-loop
 
     for (const col of column_query.results) {
@@ -145,8 +149,10 @@ async function extractSchema(project) {
     stats.table_count += 1;
   }
 
+  // Connection must be destroyed as per the specification of the getConnection() function
   connection.destroy();
 
+  // Concatenate the original project information with the new tables & stats
   return { project, tables, stats };
 }
 
