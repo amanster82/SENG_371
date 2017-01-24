@@ -1,6 +1,7 @@
+<link rel="import" href="project-box.html">
+
 <template id="ng-application">
   <link rel="stylesheet" type="text/css" href="../css/global.css">
-  <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet"> 
   <style>
     :host {
       color: #424242;
@@ -52,92 +53,6 @@
       flex: 1;
     }
 
-    .project {
-      width: 33%;
-      padding: 1rem;
-      box-sizing: border-box;
-    }
-
-    .proj_con {
-      box-shadow: var(--shadow);
-    }
-
-    .proj_bar {
-      border-bottom: 1px solid rgba(0, 0, 0, 0.117647);
-      position: relative;
-      display: flex;
-      flex-direction: row;
-    }
-
-    .circ_button_grp {
-      margin-right: 5px;
-      display: inline-block;
-      vertical-align: middle;
-      padding: 12px 0;
-    }
-
-    .circ_button {
-      cursor: pointer;
-      padding: 6px 6px;
-      display: inline-block;
-      vertical-align: middle;
-      box-sizing: border-box;
-      border: 10px;
-      border-radius: 50%;
-      transition: var(--transition);
-    }
-
-    .circ_button:hover {
-      background-color: var(--background-teal);
-      color: white;
-    }
-
-    .circ_button_text {
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-    }
-
-    .circ_button_text > i {
-      margin: 0 auto;
-    }
-
-    .proj_title {
-      display: inline-block;
-      vertical-align: middle;
-      padding: 12px;
-      flex: 1;
-      display: flex;
-    }
-
-    .proj_title_text {
-      display: inline-block;
-      align-self: center;
-      font-size: 18px;
-    }
-
-    .proj_content {
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    .proj_stats {}
-
-    .proj_stats_list {
-      list-style-type: none;
-      margin: 5px 0 5px 10px;
-      padding: 0;
-    }
-
-    .proj_open {
-      display: flex;
-    }
-
-    .proj_open > button {
-      margin: 0 auto;
-    }
-
     footer {
       background-color: var(--background-teal);
       color: white;
@@ -155,155 +70,8 @@
       </button>
     </header>
     <div class="content ">
-      <div class="content_container ">
-        <div class="project ">
-          <div class="proj_con ">
-            <div class="proj_bar ">
-              <div class="proj_title ">
-                <span class="proj_title_text ">
-                  Project Name
-                </span>
-              </div>
-              <div class="circ_button_grp ">
-                <div class="circ_button ">
-                  <div class="circ_button_text ">
-                    <i class="fa fa-ellipsis-h " aria-hidden="true "></i>
-                  </div>
-                </div>
-                <div class="circ_button ">
-                  <div class="circ_button_text ">
-                    <i class="fa fa-times " aria-hidden="true "></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="proj_content ">
-              <div class="proj_stats ">
-                <ul class="proj_stats_list ">
-                  <li>Tables: <b>123</b></li>
-                  <li>Relationships: <b>143</b></li>
-                  <li>Avg Columns: <b>12</b></li>
-                </ul>
-              </div>
-              <div class="proj_open ">
-                <button>
-                  Open Project
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="project ">
-          <div class="proj_con ">
-            <div class="proj_bar ">
-              <div class="proj_title ">
-                <span class="proj_title_text ">
-                  Project Name
-                </span>
-              </div>
-              <div class="circ_button_grp ">
-                <div class="circ_button ">
-                  <div class="circ_button_text ">
-                    <i class="fa fa-ellipsis-h " aria-hidden="true "></i>
-                  </div>
-                </div>
-                <div class="circ_button ">
-                  <div class="circ_button_text ">
-                    <i class="fa fa-times " aria-hidden="true "></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="proj_content ">
-              <div class="proj_stats ">
-                <ul class="proj_stats_list ">
-                  <li>Tables: <b>123</b></li>
-                  <li>Relationships: <b>143</b></li>
-                  <li>Avg Columns: <b>12</b></li>
-                </ul>
-              </div>
-              <div class="proj_open ">
-                <button>
-                  Open Project
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-         <div class="project ">
-          <div class="proj_con ">
-            <div class="proj_bar ">
-              <div class="proj_title ">
-                <span class="proj_title_text ">
-                  Project Name
-                </span>
-              </div>
-              <div class="circ_button_grp ">
-                <div class="circ_button ">
-                  <div class="circ_button_text ">
-                    <i class="fa fa-ellipsis-h " aria-hidden="true "></i>
-                  </div>
-                </div>
-                <div class="circ_button ">
-                  <div class="circ_button_text ">
-                    <i class="fa fa-times " aria-hidden="true "></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="proj_content ">
-              <div class="proj_stats ">
-                <ul class="proj_stats_list ">
-                  <li>Tables: <b>123</b></li>
-                  <li>Relationships: <b>143</b></li>
-                  <li>Avg Columns: <b>12</b></li>
-                </ul>
-              </div>
-              <div class="proj_open ">
-                <button>
-                  Open Project
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-         <div class="project ">
-          <div class="proj_con ">
-            <div class="proj_bar ">
-              <div class="proj_title ">
-                <span class="proj_title_text ">
-                  Project Name
-                </span>
-              </div>
-              <div class="circ_button_grp ">
-                <div class="circ_button ">
-                  <div class="circ_button_text ">
-                    <i class="fa fa-ellipsis-h " aria-hidden="true "></i>
-                  </div>
-                </div>
-                <div class="circ_button ">
-                  <div class="circ_button_text ">
-                    <i class="fa fa-times " aria-hidden="true "></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="proj_content ">
-              <div class="proj_stats ">
-                <ul class="proj_stats_list ">
-                  <li>Tables: <b>123</b></li>
-                  <li>Relationships: <b>143</b></li>
-                  <li>Avg Columns: <b>12</b></li>
-                </ul>
-              </div>
-              <div class="proj_open ">
-                <button>
-                  Open Project
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="content_container" id="project-container">
+
       </div>
     </div>
     <footer>
@@ -327,6 +95,12 @@
         const temp = document.importNode(template.content, true);
 
         root.appendChild(temp);
+
+        // Load some dummy project boxes to fill the content space
+        root.querySelector('#project-container').appendChild(document.createElement('ng-project-box'));
+        root.querySelector('#project-container').appendChild(document.createElement('ng-project-box'));
+        root.querySelector('#project-container').appendChild(document.createElement('ng-project-box'));
+        root.querySelector('#project-container').appendChild(document.createElement('ng-project-box'));
       }
     });
   })();
