@@ -1,0 +1,99 @@
+<link rel="import" href="application.html">
+
+<template id="ng-splash">
+  <link rel="stylesheet" type="text/css" href="../css/global.css">
+  <style>
+    :host {
+      color: white;
+      font-family: monospace;
+      text-shadow: 0 1px 3px rgba(0,0,0,.5);
+    }
+
+    .container {
+      display: flex;
+      height: 100%;
+      align-items: center;
+      background-color: #582b2b;
+      box-shadow: inset 0 0 100px rgba(0,0,0,.5);
+    }
+
+    .content {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .title {
+      font-size: 2.3rem;
+    }
+
+    .blurb {
+      font-size: 1.35rem;
+    }
+
+    button {
+      box-shadow: var(--shadow);
+      background-color: #753d3d;
+    }
+
+    button:hover {
+      background-color: #945252;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      text-align: center;
+      width: 100%;
+      padding-bottom: 45px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+    }
+  </style>
+
+  <div class="container">
+    <div class="content">
+      <img src="images/Logo.png" height="100px" width="100px"></img>
+      <h1 class="title">
+        Data Visualizer
+      </h1>
+      <p class="blurb">
+        A way to visualize data from any MySQL Database
+      </p>
+      <button id="transition">
+        Enter
+      </button>
+    </div>
+    <footer>
+      Created by Chris Hampu, Aman Bhayani, Adam Leung, and Deon Liang
+    </footer>
+  </div>
+</template>
+
+<script>
+  (function() {
+    const doc = document.currentScript.ownerDocument;
+    const template = doc.querySelector('#ng-splash');
+
+    customElements.define('ng-splash', class extends HTMLElement {
+      constructor() {
+        super();
+
+        const root = this.attachShadow({mode: 'closed'});
+        const temp = document.importNode(template.content, true);
+
+        root.appendChild(temp);
+
+        // This function will 'transition' from the splash page to the main project view
+        root.querySelector('#transition').addEventListener('click', (e) => {
+
+          while (root.hasChildNodes()) {
+              root.removeChild(root.lastChild);
+          }
+
+          root.appendChild(document.createElement('ng-application'));
+        });
+      }
+    });
+  })();
+</script>

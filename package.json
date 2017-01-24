@@ -10,7 +10,7 @@
     "start": "node --harmony-async-await server/main.js",
     "precommit": "npm test",
     "prepush": "npm test",
-    "dev": "browser-sync start --server public --files \"public/**/*.css, public/**/*.js, public/*.html\""
+    "dev": "browser-sync start --server public --files \"public/**/*.css, public/**/*.js, public/**/*.html\""
   },
   "repository": {
     "type": "git",
