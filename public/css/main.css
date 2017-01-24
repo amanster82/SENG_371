@@ -28,6 +28,10 @@ header {
   display: block;
 }
 
+header *{
+	box-sizing: content-box;
+}
+
 header > img {
   padding: 12px;
   vertical-align: middle;
@@ -41,6 +45,10 @@ header > img {
   padding: 6px 10px;
   background-color: white;
   transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  margin-right: 60px;
+  margin-top: 20px;
+  float: right;
+
 }
 
 .button_con:hover {
@@ -55,6 +63,7 @@ header > img {
   text-transform: uppercase;
   color: #616161;
   transition: inherit;
+  
 }
 
 .content {
@@ -167,3 +176,60 @@ footer {
 }
 
 
+.modal-open{
+    overflow: none !important;
+    padding: none !important;
+}
+
+body.modal-open { overflow:auto; padding-right:inherit !important; }
+
+.add-project .modal-dialog {
+  margin: 0;
+  height: 100%;
+  width: auto;
+}
+
+.modal-open .modal{
+	padding-right: 0px !important;
+}
+
+.add-project .modal-content {
+  border-radius: 0;
+  background-clip: border-box;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border: none;
+  min-height: 100%;
+  padding: 0px 0;
+}
+
+.add-project .close-modal {
+    position: absolute;
+    width: 75px;
+    height: 75px;
+    background-color: transparent;
+    top: 25px;
+    right: 25px;
+    cursor: pointer;
+}
+
+.add-project .close-modal .lr {
+    height: 75px;
+    width: 1px;
+    margin-left: 35px;
+    background-color: #222;
+    transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    z-index: 1051;
+}
+
+.add-project .close-modal .lr .rl {
+    height: 75px;
+    width: 1px;
+    background-color: #222;
+    transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    z-index: 1052;
+}
