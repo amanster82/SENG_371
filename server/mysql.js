@@ -99,7 +99,7 @@ async function extractSchema(project) {
     const columns = [];
     const relationships = [];
 
-    /** 
+    /**
      * Given a table name, we request a data structure that represents
      * all of the columns in the table
      */
