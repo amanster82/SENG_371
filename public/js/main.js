@@ -5,12 +5,12 @@ const store = createStore();
 // Initial state
 store.setState({
   projects: [{
-    project_name: "Project One"
+    project_name: 'Project One',
   },
   {
-    project_name: "Project Two"
+    project_name: 'Project Two',
   },
   {
-    project_name: "Project Three"
-  }]
+    project_name: 'Project Three',
+  }],
 });

@@ -99,7 +99,7 @@
         this.root.appendChild(temp);
 
         // Listen to state changes and update projects
-        store.subscribe(() => {
+        store.subscribe(() => { // eslint-disable-line no-undef
 
           this.updateProjects();
         });
@@ -110,18 +110,18 @@
 
       updateProjects() {
 
-        const state = store.getState();
-        const project_container = this.root.querySelector('#project-container');
+        const state = store.getState(); // eslint-disable-line no-undef
+        const projectContainer = this.root.querySelector('#project-container');
 
         // Remove all current projects
-        removeAllChildren(project_container);
+        removeAllChildren(projectContainer);  // eslint-disable-line no-undef
 
         // Append each project
-        for (let i = 0; i < state.projects.length; i+=1) {
+        for (let i = 0; i < state.projects.length; i += 1) {
 
           const project = new (customElements.get('ng-project-box'))(state.projects[i]);
 
-          project_container.appendChild(project);
+          projectContainer.appendChild(project);
         }
       }
     });

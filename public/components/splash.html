@@ -96,14 +96,14 @@
         // This function will 'transition' from the splash page to the main project view
         root.querySelector('#transition').addEventListener('click', () => {
 
-          root.querySelector("#container").classList.add('fade');
+          root.querySelector('#container').classList.add('fade');
 
-          setTimeout(function () { // alternatively: () => { }
+          setTimeout(() => { // alternatively: function () {}
 
             removeAllChildren(root); // eslint-disable-line no-undef
             root.appendChild(document.createElement('ng-application'));
 
-          }, 300)
+          }, 300);
         });
       }
     });
