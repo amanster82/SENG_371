@@ -119,7 +119,7 @@
         // Append each project
         for (let i = 0; i < state.projects.length; i += 1) {
 
-          const project = new (customElements.get('ng-project-box'))(state.projects[i]);
+          const project = createElement('ng-project-box', state.projects[i]); // eslint-disable-line no-undef
 
           projectContainer.appendChild(project);
         }

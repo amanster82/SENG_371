@@ -7,3 +7,11 @@ function removeAllChildren(element) { // eslint-disable-line no-unused-vars
     element.removeChild(element.lastChild);
   }
 }
+
+/**
+  * Will instantiate a web component with the given name and pass it the properties
+  */
+function createElement(elementName, props) { // eslint-disable-line no-unused-vars
+
+  return new (customElements.get(elementName))(props);
+}
