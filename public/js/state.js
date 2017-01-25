@@ -8,13 +8,41 @@
  * This will return an object with a few functions for managing global
  * application state as well as subscribers to trigger when that state changes
  */
-function createStore() {
 
-  // State tree
-  let currentState = {};
+// Check for localStorage availability
+function localStorageAvailable() {
+  try {
+    const x = '__storage_test__';
+
+    localStorage.setItem(x, x);
+    localStorage.removeItem(x);
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * This will return an object with a few functions for managing global
+ * application state as well as subscribers to trigger when that state changes
+ */
+function createStore(initialState) {
+
+  // Initial state tree
+  let currentState = initialState || {};
 
   // An array of functions to invoke when state is changed; observables
   const currentListeners = [];
+
+  // Localstorage check
+  const useLocalStorage = localStorageAvailable();
+  const storageKey = 'NexGenState';
+
+  // Load state from previous session
+  if (useLocalStorage && localStorage.getItem(storageKey)) {
+    currentState = JSON.parse(localStorage.getItem(storageKey));
+  }
 
   // Return the state of this store
   function getState() {
@@ -26,6 +54,11 @@ function createStore() {
 
     // Merge the new state into the current state non-destructively
     currentState = Object.assign({}, currentState, newState);
+
+    // Persist to localStorage
+    if (useLocalStorage) {
+      localStorage.setItem(storageKey, JSON.stringify(currentState));
+    }
 
     // Copy the listeners to avoid mutation during iteration
     const listeners = currentListeners;
