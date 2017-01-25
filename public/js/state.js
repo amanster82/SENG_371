@@ -10,7 +10,7 @@
  */
 function createStore() {
 
-  // Sstate tree
+  // State tree
   let currentState = {};
 
   // An array of functions to invoke when state is changed; observables
@@ -23,6 +23,8 @@ function createStore() {
 
   // Will update the state and trigger all listener callbacks
   function setState(newState) {
+
+    // Merge the new state into the current state non-destructively
     currentState = Object.assign({}, currentState, newState);
 
     // Copy the listeners to avoid mutation during iteration

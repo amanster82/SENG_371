@@ -103,7 +103,7 @@
   <div class="proj_con ">
     <div class="proj_bar ">
       <div class="proj_title ">
-        <span class="proj_title_text ">
+        <span class="proj_title_text" id="project_title">
           Project Name
         </span>
       </div>
@@ -143,13 +143,23 @@
     const template = doc.querySelector('#ng-project-box');
 
     customElements.define('ng-project-box', class extends HTMLElement {
-      constructor() {
+      constructor(props) {
         super();
 
         const root = this.attachShadow({ mode: 'closed' });
         const temp = document.importNode(template.content, true);
 
-        root.appendChild(temp);
+        this.props = props;
+        this.root = root;
+
+        this.root.appendChild(temp);
+
+        this.update();
+      }
+
+      update() {
+
+        this.root.querySelector('#project_title').innerHTML = this.props.project_name;
       }
     });
   })();

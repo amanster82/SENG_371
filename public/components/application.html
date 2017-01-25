@@ -94,13 +94,35 @@
         const root = this.attachShadow({ mode: 'closed' });
         const temp = document.importNode(template.content, true);
 
-        root.appendChild(temp);
+        this.root = root;
 
-        // Load some dummy project boxes to fill the content space
-        root.querySelector('#project-container').appendChild(document.createElement('ng-project-box'));
-        root.querySelector('#project-container').appendChild(document.createElement('ng-project-box'));
-        root.querySelector('#project-container').appendChild(document.createElement('ng-project-box'));
-        root.querySelector('#project-container').appendChild(document.createElement('ng-project-box'));
+        this.root.appendChild(temp);
+
+        // Listen to state changes and update projects
+        store.subscribe(() => {
+
+          this.updateProjects();
+        });
+
+        // Update based on initial state
+        this.updateProjects();
+      }
+
+      updateProjects() {
+
+        const state = store.getState();
+        const project_container = this.root.querySelector('#project-container');
+
+        // Remove all current projects
+        removeAllChildren(project_container);
+
+        // Append each project
+        for (let i = 0; i < state.projects.length; i+=1) {
+
+          const project = new (customElements.get('ng-project-box'))(state.projects[i]);
+
+          project_container.appendChild(project);
+        }
       }
     });
   })();
