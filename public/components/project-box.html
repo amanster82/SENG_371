@@ -98,6 +98,37 @@
     .proj_open > button {
       margin: 0 auto;
     }
+
+    .dropdown {
+      position: absolute;
+      background-color: #fff;
+      color: #000;
+      width: 100px;
+      right: 55px;
+      box-shadow: var(--shadow);
+      height: 0;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .dropdown.show {
+      opacity: 1;
+      height: 93px;
+    }
+
+    .dropdown > ul {
+      padding: 0.75rem 0;
+      margin: 0;
+    }
+
+    .dropdown > ul > li {
+      padding: 0.5rem 1rem;
+    }
+
+    .dropdown > ul > li:hover {
+      background-color: #ebebeb;
+      color: var(--background-teal);
+    }
   </style>
 
   <div class="proj_con ">
@@ -108,9 +139,15 @@
         </span>
       </div>
       <div class="circ_button_grp ">
-        <div class="circ_button ">
+        <div class="circ_button " id="menu_button">
           <div class="circ_button_text ">
             <i class="fa fa-ellipsis-h " aria-hidden="true "></i>
+          </div>
+          <div class="dropdown" id="dropdown">
+            <ul>
+              <li id="rename_project">Rename</li>
+              <li id="open_project">Open</li>
+            </ul>
           </div>
         </div>
         <div class="circ_button " id="close_button">
@@ -129,7 +166,7 @@
         </ul>
       </div>
       <div class="proj_open ">
-        <button>
+        <button id="open_project_button">
           Open Project
         </button>
       </div>
@@ -170,11 +207,45 @@
             projects,
           });
         });
+
+        // Toggle the visibility of the dropdown
+        this.root.querySelector('#menu_button').addEventListener('click', () => {
+
+          this.root.querySelector('#dropdown').classList.toggle('show');
+        });
+
+        // This will hide the dropdown if the mouse leaves it
+        this.root.querySelector('#dropdown').addEventListener('mouseleave', () => {
+
+          this.root.querySelector('#dropdown').classList.remove('show');
+        });
+
+        this.root.querySelector('#rename_project').addEventListener('click', () => {
+
+          // TODO: Give user ability to rename this project by using an input field
+        });
+
+        // Dropdown menu button to open project
+        this.root.querySelector('#open_project').addEventListener('click', () => {
+
+          this.openProject();
+        });
+
+        // Main button in the project body
+        this.root.querySelector('#open_project_button').addEventListener('click', () => {
+
+          this.openProject();
+        });
       }
 
+      // Update the project if it has changed. This includes name, stats, etc
       update() {
 
         this.root.querySelector('#project_title').innerHTML = this.props.project_name;
+      }
+
+      // TODO: Transition to ER diagram page
+      openProject() { // eslint-disable-line class-methods-use-this
       }
     });
   })();

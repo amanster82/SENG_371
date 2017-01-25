@@ -52,3 +52,7 @@ b {
   font-weight: initial;
   font-size: 17px;
 }
+
+ul {
+  list-style-type: none;
+}
