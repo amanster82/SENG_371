@@ -1,4 +1,5 @@
 <link rel="import" href="project-box.html">
+<link rel="import" href="create-project.html">
 
 <template id="ng-application">
   <link rel="stylesheet" type="text/css" href="../css/global.css">
@@ -56,29 +57,55 @@
     footer {
       background-color: var(--background-teal);
       color: white;
+      position: absolute;
+      bottom: 0;
+      width: 100%
     }
 
     .footer_content {
       padding: 20px;
     }
+
+    .fadeIn {
+      transform: scale3d(1, 1, 1) !important;
+      opacity: 1 !important;
+      transition: var(--long-transition);
+    }
+
+    #cp {
+      transform: scale3d(0.85, 0.85, 1);
+    }
+
+    .makeInvisible{
+      opacity: 0;
+    }
+
+    .cpRemove{
+      transform: scale3d(0.85, 0.85, 1);
+      opacity: 0;
+    }
+
+
+
   </style>
+    <div id="full">
+      <header>
+        <img src="images/Logo.png" height="48px" width="48px"></img>
+        <button class="create_project">
+        Create Project
+        </button>
+      </header>
+      <div class="content ">
+        <div class="content_container" id="project-container">
 
-    <header>
-      <img src="images/Logo.png" height="48px" width="48px"></img>
-      <button class="create_project">
-      Create Project
-      </button>
-    </header>
-    <div class="content ">
-      <div class="content_container" id="project-container">
-
+        </div>
       </div>
+      <footer>
+        <div class="footer_content ">
+          Copyright 2017 &copy; NexGen
+        </div>
+      </footer>
     </div>
-    <footer>
-      <div class="footer_content ">
-        Copyright 2017 &copy; NexGen
-      </div>
-    </footer>
 
 </template>
 
@@ -90,7 +117,6 @@
     customElements.define('ng-application', class extends HTMLElement {
       constructor() {
         super();
-
         const root = this.attachShadow({ mode: 'closed' });
         const temp = document.importNode(template.content, true);
 
@@ -106,6 +132,19 @@
 
         // Update based on initial state
         this.updateProjects();
+        root.querySelector('.create_project').addEventListener('click', () => {
+          const cp = document.createElement('ng-create-project');
+          cp.setAttribute('class', 'makeInvisible');
+          root.appendChild(cp);
+
+
+          setTimeout(() => {
+            cp.setAttribute('id', 'cp');
+            root.querySelector('#cp').classList.add('fadeIn');
+
+          }, 0);
+        });
+
       }
 
       updateProjects() {

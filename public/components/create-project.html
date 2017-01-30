@@ -1,0 +1,195 @@
+<template id="ng-create-project">
+	<link rel="stylesheet" type="text/css" href="../css/global.css">
+	<link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet"> 
+	
+	<style>
+    :host {
+      opacity: 1;
+      position: absolute;
+      background: url(../images/database.jpg) center;
+      background-size: 100%
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      transition: var(--long-transition);
+      overflow: hidden;
+
+    }
+
+    .container{
+      margin: 0 auto;
+      transform: scale3d(1, 1, 1);
+      overflow: hidden;
+
+    } 
+
+    #container::before {
+      content: '';
+      filter: opacity(30%);
+      background: grey;
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    
+		#content {
+			color: white;
+			font-size: 20px;
+      text-align: center;
+      padding: 50px;
+		
+		}
+
+    .group { 
+      position:relative; 
+      margin-bottom:45px; 
+    }
+    
+    input {
+      font-size:18px;
+      padding:10px 0px 10px 0px;
+      display:block;
+      width:100%;
+      border:none;
+      border-bottom:1px solid #757575;
+    }
+
+
+    .bar  { 
+      position:relative; 
+      display:block; 
+      width:100%; 
+    }
+    
+    .bar:before, .bar:after   {
+      content:'';
+      height:2px; 
+      width:0;
+      bottom:1px; 
+      position:absolute;
+      background: var(--background-teal); 
+      transition:0.2s ease all; 
+    }
+    .bar:before {
+      left:50%;
+    }
+
+    .bar:after {
+      right:50%; 
+    }
+
+/* active state */
+input:focus ~ .bar:before, input:focus ~ .bar:after {
+  width:50%;
+}
+  
+     /* input:focus{ 
+        outline:none; 
+      } */
+
+    label          {
+        color:#999; 
+        font-size:18px;
+        font-weight:normal;
+        position:absolute;
+        pointer-events:none;
+        left:5px;
+        top:10px;
+        transition:0.2s ease all; 
+    }
+
+/* active state */
+input:focus ~ label, input:valid ~ label     {
+  top: -20px;
+  font-size:14px;
+  color:var(--background-teal);
+}
+
+#submit{
+  margin-top: 20px;
+  background-colo
+}
+
+button:hover {
+  background-color: var(--background-teal);
+  color: white;
+}
+    
+	</style>
+	
+	
+	<!-- HTML TO WRITE HERE -->
+  
+ 
+  <div class="container" id="container">
+    <div id="content">
+    <h1> Connect to a Database </h1>
+    <i class="fa fa-plug fa-5x" aria-hidden="true" style="margin-bottom: 10px;"></i>
+    <div class="box" style="padding-top: 20px;">
+      <form>
+        <div class="group">
+          <input required="" type="text"> 
+          <span class="highlight"></span> 
+          <span class="bar"></span>
+          <label>Database Host</label>
+        </div>
+        <div class="group">
+          <input required="" type="text"> 
+          <span class="highlight"></span> 
+          <span class="bar"></span> 
+          <label>Username</label>
+        </div>
+          <div class="group">
+          <input required="" type="text"> 
+          <span class="highlight"></span> 
+          <span class="bar"></span> 
+          <label>Password</label>
+          <button id="submit"> Submit </button>
+        </div>
+        </form>
+   
+
+          <button id="back">back</button>
+      
+      </div>
+    </div>
+  </div>
+	
+</template>
+	
+	
+<script>
+(function () {
+  const doc = document.currentScript.ownerDocument;
+  const template = doc.querySelector('#ng-create-project');
+
+  customElements.define('ng-create-project', class extends HTMLElement {
+    constructor() {
+      super();
+      const root = this.attachShadow({ mode: 'closed' });
+      const temp = document.importNode(template.content, true);
+
+      root.appendChild(temp);
+
+      root.querySelector('#back').addEventListener('click', () => {
+
+        this.className = '';
+        this.classList.add('cpRemove');
+
+        setTimeout(() => {
+          this.remove();
+
+        }, 800);
+
+
+      });
+
+
+    }
+
+
+  });
+})();
+
+</script>
