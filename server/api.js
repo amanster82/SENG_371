@@ -33,7 +33,7 @@ router.post('/mysql/extract', async (ctx) => {
 
   if (!verifyProjectFields(project)) {
 
-    ctx.body = { error: 'Project connection parameters are missing or invalid' };
+    ctx.body = { error: 'Project connection parameters are missing or invalid', success: false };
     return;
   }
 
