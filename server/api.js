@@ -33,7 +33,7 @@ router.post('/mysql/extract', async (ctx) => {
 
   if (!verifyProjectFields(project)) {
 
-    ctx.body = 'Required parameters are missing';
+    ctx.body = { error: 'Project connection parameters are missing or invalid' };
     return;
   }
 
@@ -50,16 +50,16 @@ router.post('/mysql/testconnection', async (ctx) => {
 
   if (!verifyProjectFields(project)) {
 
-    ctx.body = 'Required parameters are missing';
+    ctx.body = { error: 'Project connection parameters are missing or invalid', success: false };
     return;
   }
 
   const valid = await mysql.verifyConnectionParameters(project);
 
   if (valid) {
-    ctx.body = 'Connected';
+    ctx.body = { status: 'Connected', success: true };
   } else {
-    ctx.body = 'Failed to connect';
+    ctx.body = { error: 'Failed to connect', success: false };
   }
 });
 

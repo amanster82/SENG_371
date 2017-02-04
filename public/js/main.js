@@ -10,6 +10,13 @@ if (store.getState().projects.length === 0) {
   store.setState({
     projects: [{
       project_name: 'Project One',
+      connection_info: {
+        host: 'champu.me',
+        port: 3306,
+        database: 'nexgen',
+        user: 'nexgen',
+        password: 'nexgen',
+      },
     },
     {
       project_name: 'Project Two',
