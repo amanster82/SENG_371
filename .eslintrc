@@ -5,6 +5,11 @@
     "node": true
   },
   "rules": {
-    "padded-blocks": "off"
-  }
+    "padded-blocks": "off",
+    "wrap-iife": "off",
+    "func-names": "off"
+  },
+  "plugins": [
+    "html"
+  ]
 }

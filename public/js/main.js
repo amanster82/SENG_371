@@ -1,4 +1,28 @@
-// jQuery substitute to select nodes in a page
-const $ = el => document.querySelectorAll(el)[0];
+/* eslint-disable no-unused-vars, no-undef */
+// Create a global state store with an initial state
+const store = createStore({
+  projects: [],
+});
 
-$('body').classList.add('root');
+// If projects page is empty, then for debug purposes populate it with a few
+// TODO: Remove this once more functionality is added to application
+if (store.getState().projects.length === 0) {
+  store.setState({
+    projects: [{
+      project_name: 'Project One',
+      connection_info: {
+        host: 'champu.me',
+        port: 3306,
+        database: 'nexgen',
+        user: 'nexgen',
+        password: 'nexgen',
+      },
+    },
+    {
+      project_name: 'Project Two',
+    },
+    {
+      project_name: 'Project Three',
+    }],
+  });
+}

@@ -1,0 +1,378 @@
+<template id="ng-project-box">
+  <link rel="stylesheet" type="text/css" href="../css/global.css">
+  <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet"> 
+  <style>
+    :host {
+      width: 33%;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      color: #313131;
+      min-width: 136px;
+    }
+
+    button:hover {
+      background-color: var(--background-teal);
+      color: white;
+    }
+
+    .proj_con {
+      box-shadow: var(--shadow);
+    }
+
+    .proj_bar {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.117647);
+      position: relative;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .circ_button_grp {
+      margin-right: 5px;
+      display: inline-block;
+      vertical-align: middle;
+      padding: 12px 0;
+    }
+
+    .circ_button {
+      cursor: pointer;
+      padding: 6px 6px;
+      display: inline-block;
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 10px;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .circ_button:hover {
+      background-color: var(--background-teal);
+      color: white;
+    }
+
+    .circ_button_text {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .circ_button_text > i {
+      margin: 0 auto;
+    }
+
+    .proj_title {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 12px;
+      flex: 1;
+      display: flex;
+    }
+
+    .proj_title_text {
+      display: inline-block;
+      align-self: center;
+      font-size: 18px;
+    }
+
+    .proj_content {
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .proj_stats {}
+
+    .proj_stats_list {
+      list-style-type: none;
+      margin: 5px 0 5px 10px;
+      padding: 0;
+    }
+
+    .proj_open {
+      display: flex;
+    }
+
+    .proj_open > button {
+      margin: 0 auto;
+    }
+
+    .proj_err {
+      color: #F44336;
+    }
+
+    .dropdown {
+      position: absolute;
+      background-color: #fff;
+      color: #000;
+      right: 55px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: var(--transition);
+      pointer-events: none;
+    }
+
+    .dropdown.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .dropdown > ul {
+      padding: 0.75rem 0;
+      margin: 0;
+    }
+
+    .dropdown > ul > li {
+      padding: 0.5rem 1rem;
+    }
+
+    .dropdown > ul > li:hover {
+      background-color: #ebebeb;
+      color: var(--background-teal);
+    }
+  </style>
+
+  <div class="proj_con ">
+    <div class="proj_bar ">
+      <div class="proj_title ">
+        <span class="proj_title_text" id="project_title">
+          Project Name
+        </span>
+      </div>
+      <div class="circ_button_grp ">
+        <div class="circ_button " id="menu_button">
+          <div class="circ_button_text ">
+            <i class="fa fa-ellipsis-h " aria-hidden="true "></i>
+          </div>
+          <div class="dropdown" id="dropdown">
+            <ul>
+              <li id="rename_project">Rename</li>
+              <li id="connect_info">Connection Info</li>
+              <li id="project_info">Project Info</li>
+            </ul>
+          </div>
+        </div>
+        <div class="circ_button " id="close_button">
+          <div class="circ_button_text ">
+            <i class="fa fa-times " aria-hidden="true "></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="proj_content">
+      <div class="proj_stats" id="content">
+      </div>
+      <div class="proj_open ">
+        <button id="open_project_button">
+          Open Project
+        </button>
+      </div>
+      <div class="proj_err" id="project_error">
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+/* eslint-disable no-undef */
+  (function () {
+    const doc = document.currentScript.ownerDocument;
+    const template = doc.querySelector('#ng-project-box');
+
+    customElements.define('ng-project-box', class extends HTMLElement {
+      constructor(props) {
+        super();
+
+        const root = this.attachShadow({ mode: 'closed' });
+        const temp = document.importNode(template.content, true);
+
+        this.props = props;
+        this.root = root;
+
+        this.root.appendChild(temp);
+
+        this.update();
+
+        // Action to delete this project
+        this.root.querySelector('#close_button').addEventListener('click', () => {
+
+          // Get current projects array
+          const projects = store.getState().projects; // eslint-disable-line no-undef
+
+          // Find the project that matches the name of this project and splice it from array
+          projects.splice(this.getProjectIndex(), 1);
+
+          // Persist back the modified project list
+          store.setState({ // eslint-disable-line no-undef
+            projects,
+          });
+        });
+
+        // Toggle the visibility of the dropdown
+        this.root.querySelector('#menu_button').addEventListener('click', () => {
+
+          this.root.querySelector('#dropdown').classList.toggle('show');
+        });
+
+        // This will hide the dropdown if the mouse leaves it
+        this.root.querySelector('#dropdown').addEventListener('mouseleave', () => {
+
+          this.root.querySelector('#dropdown').classList.remove('show');
+        });
+
+        this.root.querySelector('#rename_project').addEventListener('click', () => {
+
+          this.setContentState('rename');
+        });
+
+        // Show connection info
+        this.root.querySelector('#connect_info').addEventListener('click', () => {
+
+          this.setContentState('info');
+        });
+
+        this.root.querySelector('#project_info').addEventListener('click', () => {
+
+          this.setContentState();
+        });
+      }
+
+      // Update the project if it has changed. This includes name, stats, etc
+      update() {
+
+        this.updateSchema();
+        this.updateContent();
+      }
+
+      updateContent() {
+        if (!this.props.page || this.props.page === 'rename') {
+
+          if (!this.props.tables || this.props.tables === 0) {
+            this.root.querySelector('#content').innerHTML =
+              'Project is loading...';
+          } else if (this.props.stats) {
+
+            const stats = this.props.stats;
+
+            this.root.querySelector('#content').innerHTML =
+              `<ul class="proj_stats_list ">
+                <li>Tables: <b>${stats.table_count}</b></li>
+                <li>Relationships: <b>${stats.relationship_count}</b></li>
+                <li>Columns: <b>${stats.column_count}</b></li>
+              </ul>`;
+          }
+
+          // Main button in the project body
+          this.root.querySelector('#open_project_button').addEventListener('click', () => {
+
+            this.openProject();
+          });
+        } else if (this.props.page === 'info') {
+
+          if (!this.props.connection_info) {
+            this.root.querySelector('#content').innerHTML =
+              'Connection parameters are not configured';
+          } else {
+
+            const params = this.props.connection_info;
+
+            this.root.querySelector('#content').innerHTML =
+              `<ul class="proj_stats_list ">
+                <li>Host: <b>${params.host || 'Not defined'}</b></li>
+                <li>Port: <b>${params.port || 'Not defined'}</b></li>
+                <li>Database: <b>${params.database || 'Not defined'}</b></li>
+                <li>User: <b>${params.user || 'Not defined'}</b></li>
+                <li>Password: <b>${params.password || 'Not defined'}</b></li>
+              </ul>`;
+          }
+        }
+
+        if (this.props.page === 'rename') {
+
+          this.root.querySelector('#project_title').innerHTML =
+            `<input type="text" id="new_project_title"></input>
+            <button id="confirm_project_title">
+              Confirm
+            </button><button id="cancel_project_title">
+              Cancel
+            </button>`;
+
+          this.root.querySelector('#confirm_project_title').addEventListener('click', () => {
+
+            const projects = store.getState().projects;
+
+            projects[this.getProjectIndex()].project_name = this.root.querySelector('#new_project_title').value;
+            projects[this.getProjectIndex()].page = null;
+
+            store.setState({
+              projects,
+            });
+          });
+
+          this.root.querySelector('#cancel_project_title').addEventListener('click', () => {
+
+            this.setContentState();
+          });
+        } else {
+          this.root.querySelector('#project_title').innerHTML = this.props.project_name;
+        }
+      }
+
+      updateSchema() {
+
+        // Need to pull schema from server since we're missing the information
+        if (!this.props.tables || this.props.tables.length === 0) {
+          fetch(`${window.location}mysql/extract`, {
+            method: 'POST',
+            body: JSON.stringify(this.props),
+            headers: {
+              'content-type': 'application/json',
+            },
+          })
+          .then(res => res.json())
+          .then(res => this.handleSchemaResponse(res))
+          .catch((err) => {
+            this.root.querySelector('#project_error').innerHTML = err;
+          });
+        }
+      }
+
+      handleSchemaResponse(res) {
+
+        if (res.error) {
+          this.root.querySelector('#project_error').innerHTML = res.error;
+        } else if (res.tables && res.tables.length) {
+
+          const projects = store.getState().projects;
+
+          projects[this.getProjectIndex()] = res;
+
+          store.setState({
+            projects,
+          });
+        }
+      }
+
+      // Page should be either null, 'rename', or 'info'
+      setContentState(page) {
+        const projects = store.getState().projects;
+
+        projects[this.getProjectIndex()].page = page;
+
+        store.setState({
+          projects,
+        });
+      }
+
+      // TODO: Transition to ER diagram page
+      openProject() { // eslint-disable-line class-methods-use-this
+      }
+
+      getProjectIndex() {
+        return store.getState().projects.findIndex(el =>
+          el.project_name === this.props.project_name);
+      }
+    });
+  })();
+</script>
