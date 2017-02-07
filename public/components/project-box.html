@@ -1,3 +1,5 @@
+<link rel="import" href="view-diagram.html">
+
 <template id="ng-project-box">
   <link rel="stylesheet" type="text/css" href="../css/global.css">
   <link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet"> 
@@ -367,6 +369,10 @@
 
       // TODO: Transition to ER diagram page
       openProject() { // eslint-disable-line class-methods-use-this
+
+        const element = createElement('ng-view-diagram', this.props);
+
+        this.root.appendChild(element);
       }
 
       getProjectIndex() {

@@ -1,0 +1,418 @@
+<template id='ng-view-diagram'>
+  <link rel='stylesheet' type='text/css' href='../css/global.css'>
+  <link href='https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css' rel='stylesheet'> 
+  <style>
+    :host {
+      position: fixed;
+      top: 73px;
+      bottom: 58px;
+      left: 0;
+      right: 0;
+      z-index: 1;
+    }
+
+    button {
+      color: #313131;
+      min-width: 145px;
+    }
+
+    button i {
+      margin-right: 0.5rem;
+    }
+
+    button:hover {
+      background-color: var(--background-teal);
+      color: white;
+    }
+
+    .diagram_view {
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.35);
+      background-color: rgba(255,255,255,1);
+      transition: var(--long-transition);
+      opacity: 0;
+    }
+
+    .fade_in {
+      opacity: 1;
+    }
+
+    .diagram_body {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 0.5rem;
+      box-sizing: border-box;
+    }
+
+    .options_lane {
+      padding: 1rem 0;
+    }
+
+    .diagram_lane {
+      flex: 1;
+    }
+
+    .diagram_container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+    }
+
+    canvas {
+      flex: 1;
+      width: auto !important;
+      height: auto !important;
+      position: relative !important;
+    }
+
+    .back_button {
+      min-width: 225px;
+      margin-right: 0.75rem;
+    }
+
+    .align_right {
+      text-align: right;
+    }
+
+    .layout_options {
+      margin: 0.25rem 0 0.5rem 1rem;
+    }
+
+    .guide {
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .layout_options button {
+      display: inline-block;
+      margin-right: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+  </style>
+
+  <div class='diagram_view'>
+    <div class='diagram_body'>
+      <div class='options_lane align_right'>
+        <button class='back_button'><i class='fa fa-chevron-left' aria-hidden='true'></i>View Another Project</button>
+      </div>
+      <div class='diagram_lane'>
+        <div class='diagram_container'>
+        </div>
+      </div>
+      <div class='options_lane layout_options'>
+        <div class='guide'>
+        Layout
+        </div>
+        <button class='grid'>Grid</button>
+        <button class='directed'>Force-Directed</button>
+        <button class='circular'>Circular</button>
+        <button class='digraph'>Layered Digraph</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+/* eslint-disable no-undef, comma-dangle, no-restricted-syntax */
+
+  (function () {
+    const doc = document.currentScript.ownerDocument;
+    const template = doc.querySelector('#ng-view-diagram');
+
+    customElements.define('ng-view-diagram', class extends HTMLElement {
+      constructor(props) {
+        super();
+
+        const root = this.attachShadow({ mode: 'closed' });
+        const temp = document.importNode(template.content, true);
+
+        this.props = props;
+        this.root = root;
+
+        this.root.appendChild(temp);
+
+        // Store state about this diagram view
+        this.state = {
+          layout: 'directed'
+        };
+
+        // Fade-in handler
+        setTimeout(() => {
+
+          this.root.querySelector('.diagram_view').classList.add('fade_in');
+        }, 10);
+
+        // Load all button event handleres in this page
+        this.assignButtonHandlers();
+
+        // Initial load
+        this.update();
+      }
+
+      get layout() {
+
+        switch (this.state.layout) {
+          case 'grid':
+            return $(go.GridLayout, { comparer: go.GridLayout.smartComparer });
+          case 'digraph':
+            return $(go.LayeredDigraphLayout);
+          case 'circular':
+            return $(go.CircularLayout);
+          default:
+            return $(go.ForceDirectedLayout);
+        }
+      }
+
+      // List of colors used by the page
+      get brushes() { // eslint-disable-line class-methods-use-this
+
+        return {
+          white: '#ffffff',
+          lightblue: '#98bfda'
+        };
+      }
+
+      /**
+        * Converts the NexGen data structure received from the server to the expected
+        * goJS data structure. Also adds colors, keys, text, etc.
+        */
+      get entityNodes() {
+
+        const relationships = [];
+        const nodes = [];
+
+        for (const table of this.props.tables) {
+
+          const items = [];
+
+          for (const column of table.columns) {
+
+            items.push({ name: column.column_name, iskey: false, figure: 'Decision', color: this.brushes.yellowgrad });
+          }
+
+          nodes.push({ key: table.table_name, items });
+
+          for (const relation of table.relationships) {
+
+            relationships.push({ from: table.table_name, to: relation.table_name, text: '', toText: '' });
+          }
+        }
+
+        return { nodes, relationships };
+      }
+
+      // Update the diagram view if it has changes
+      update() {
+
+        // Initializes the goJS canvas and templates
+        this.initializeDiagram();
+      }
+
+      assignButtonHandlers() {
+
+        this.root.querySelector('.grid').addEventListener('click', () => {
+
+          this.state.layout = 'grid';
+          this.update();
+        });
+
+        this.root.querySelector('.circular').addEventListener('click', () => {
+
+          this.state.layout = 'circular';
+          this.update();
+        });
+
+        this.root.querySelector('.digraph').addEventListener('click', () => {
+
+          this.state.layout = 'digraph';
+          this.update();
+        });
+
+        this.root.querySelector('.directed').addEventListener('click', () => {
+
+          this.state.layout = 'directed';
+          this.update();
+        });
+
+        // Event handler for leaving this page
+        this.root.querySelector('.back_button').addEventListener('click', () => {
+
+          this.root.querySelector('.diagram_view').classList.remove('fade_in');
+
+          setTimeout(() => {
+
+            this.remove();
+          }, 350);
+        });
+      }
+
+      initializeDiagram() {
+
+        // If the diagram already exists, overwrite the container div
+        if (this.diagram) {
+          this.root.querySelector('.diagram_lane').innerHTML = "<div class='diagram_container'></div>";
+        }
+
+        setTimeout(() => {
+
+          // Initialize the goJS canvas
+          this.diagram = $(go.Diagram,
+            this.root.querySelector('.diagram_container'),
+            {
+              initialContentAlignment: go.Spot.Center,
+              allowDelete: false,
+              allowCopy: false,
+              layout: this.layout,
+              'undoManager.isEnabled': true,
+            }
+          );
+
+          this.itemTemplate = $(go.Panel,
+            'Horizontal',
+            $(go.Shape,
+              { desiredSize: new go.Size(10, 10) },
+              new go.Binding('figure', 'figure'),
+              new go.Binding('fill', 'color')
+            ),
+            $(go.TextBlock,
+              {
+                stroke: '#333333',
+                font: 'bold 14px sans-serif',
+                margin: new go.Margin(0, 0, 0, 5),
+              },
+              new go.Binding('text', 'name')
+            )
+          );
+
+          this.diagram.nodeTemplate = $(go.Node,
+            'Auto',
+            {
+              selectionAdorned: true,
+              resizable: true,
+              fromSpot: go.Spot.AllSides,
+              toSpot: go.Spot.AllSides,
+              isShadowed: true,
+              shadowColor: '#C5C1AA'
+            },
+            new go.Binding('location', 'location').makeTwoWay(),
+            $(go.Shape, 'RoundedRectangle', { fill: this.brushes.lightblue, stroke: '#756875', strokeWidth: 3 }),
+            $(go.Panel, 'Table',
+              { margin: 8, stretch: go.GraphObject.Fill },
+              $(go.RowColumnDefinition, { row: 0, sizing: go.RowColumnDefinition.None }),
+              $(go.TextBlock,
+                {
+                  row: 0,
+                  alignment: go.Spot.Center,
+                  margin: new go.Margin(0, 14, 0, 2),
+                  font: 'bold 16px sans-serif'
+                },
+                new go.Binding('text', 'key')
+              ),
+              $('PanelExpanderButton', 'LIST', { row: 0, alignment: go.Spot.TopRight }),
+              $(go.Panel, 'Vertical',
+                $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: null }),
+                {
+                  name: 'LIST',
+                  row: 1,
+                  padding: 3,
+                  alignment: go.Spot.TopLeft,
+                  defaultAlignment: go.Spot.Left,
+                  stretch: go.GraphObject.Horizontal,
+                  itemTemplate: this.itemTemplate
+                },
+                new go.Binding('itemArray', 'items')
+              )
+            ) // End table panel
+          ); // End template
+
+          this.diagram.nodeTemplate = $(go.Node,
+            'Auto',
+            {
+              selectionAdorned: true,
+              resizable: true,
+              fromSpot: go.Spot.AllSides,
+              toSpot: go.Spot.AllSides,
+              isShadowed: true,
+              shadowColor: '#C5C1AA'
+            },
+            new go.Binding('location', 'location').makeTwoWay(),
+            $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: '#756875', strokeWidth: 3 }),
+            $(go.Panel, 'Vertical',
+              $(go.Panel, 'Auto',
+                { stretch: go.GraphObject.Horizontal },
+                $(go.Shape, { fill: this.brushes.lightblue, stroke: null }),
+                $(go.TextBlock,
+                  {
+                    row: 0,
+                    alignment: go.Spot.Center,
+                    margin: new go.Margin(5, 20, 5, 20),
+                    font: 'bold 16px sans-serif'
+                  },
+                  new go.Binding('text', 'key')
+                ),
+                $('PanelExpanderButton', 'LIST', { row: 0, alignment: go.Spot.TopRight })
+              ),
+              $(go.Panel, 'Vertical',
+                { margin: new go.Margin(5) },
+                $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: null }),
+                {
+                  name: 'LIST',
+                  row: 1,
+                  padding: 3,
+                  alignment: go.Spot.TopLeft,
+                  defaultAlignment: go.Spot.Left,
+                  stretch: go.GraphObject.Horizontal,
+                  itemTemplate: this.itemTemplate
+                },
+                new go.Binding('itemArray', 'items')
+              )
+            )
+          ); // End template
+
+          this.diagram.linkTemplate = $(go.Link,
+            {
+              selectionAdorned: true,
+              layerName: 'Foreground',
+              reshapable: true,
+              routing: go.Link.AvoidsNodes,
+              corner: 5,
+              curve: go.Link.JumpOver
+            },
+            $(go.Shape, { stroke: '#303B45', strokeWidth: 2.5 }),
+            $(go.TextBlock,
+              {
+                textAlign: 'center',
+                font: 'bold 14px sans-serif',
+                stroke: '#1967B3',
+                segmentIndex: 0,
+                segmentOffset: new go.Point(NaN, NaN),
+                segmentOrientation: go.Link.OrientUpright
+              },
+              new go.Binding('text', 'text')
+            ),
+            $(go.TextBlock,
+              {
+                textAlign: 'center',
+                font: 'bold 14px sans-serif',
+                stroke: '#1967B3',
+                segmentIndex: -1,
+                segmentOffset: new go.Point(NaN, NaN),
+                segmentOrientation: go.Link.OrientUpright
+              },
+              new go.Binding('text', 'toText')
+            ) // End textblock
+          ); // End template
+
+          const entities = this.entityNodes;
+
+          this.diagram.model = new go.GraphLinksModel(entities.nodes, entities.relationships);
+
+        }, 10);
+      }
+    });
+  })();
+</script>
