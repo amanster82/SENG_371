@@ -1,7 +1,7 @@
 <template id="ng-create-project">
 	<link rel="stylesheet" type="text/css" href="../css/global.css">
 	<link href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" rel="stylesheet"> 
-	
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet">
 	<style>
     :host {
       opacity: 1;
@@ -12,8 +12,6 @@
       display: flex;
       align-items: center;
       transition: var(--long-transition);
-      overflow: hidden;
-
     }
 
     .container{
@@ -127,10 +125,28 @@
     <div class="box" style="padding-top: 20px;">
       <form>
         <div class="group">
+          <input id="title" required="" type="text"> 
+          <span class="highlight"></span> 
+          <span class="bar"></span>
+          <label>Project Title</label>
+        </div>
+        <div class="group">
           <input id="db_host" required="" type="text"> 
           <span class="highlight"></span> 
           <span class="bar"></span>
           <label>Database Host</label>
+        </div>
+        <div class="group">
+          <input id="port" required="" type="text"> 
+          <span class="highlight"></span> 
+          <span class="bar"></span>
+          <label>Port</label>
+        </div>
+        <div class="group">
+          <input id="schema" required="" type="text"> 
+          <span class="highlight"></span> 
+          <span class="bar"></span>
+          <label>Schema Name</label>
         </div>
         <div class="group">
           <input id="user" required="" type="text"> 
@@ -145,7 +161,9 @@
           <label>Password</label>
           <button id="submit" onsubmit="return false"> Submit </button>
         </div>
-        </form>
+      </form>
+
+      <div id="result"></div>
    
 
           <button id="back">back</button>
@@ -183,36 +201,73 @@
 
       });
 
-      this.data_input();
+      this.dataInput();
     }
 
 
-    data_input() {
+    dataInput() {
 
-        this.root.querySelector('#submit').addEventListener('click', () => {
+      this.root.querySelector('#submit').addEventListener('click', (event) => {
 
-          const db_host = this.root.querySelector('#db_host').value;
-          const user = this.root.querySelector('#user').value;
-          const pass = this.root.querySelector('#pass').value;
+        event.stopPropagation();
+        event.preventDefault();
 
-          fetch(`mysql/extract`, {
-            method: 'POST',
-            body: JSON.stringify({
-              db_host: db_host,
-              user: user,
-              pass: pass
-            })
+        const title = this.root.querySelector('#title').value;
+        const dbhost = this.root.querySelector('#db_host').value;
+        const port = this.root.querySelector('#port').value;
+        const database = this.root.querySelector('#schema').value;
+        const user = this.root.querySelector('#user').value;
+        const pass = this.root.querySelector('#pass').value;
 
+        fetch(`${window.location}mysql/testconnection`, {
+          method: 'POST',
+          body: JSON.stringify({
+            project_name: title,
+            connection_info: {
+              host: dbhost,
+              port,
+              database,
+              user,
+              password: pass,
+            },
+          }),
+          headers: {
+            'content-type': 'application/json',
+          },
+        })
+
+          .then(response => response.json())
+
+          .then((res) => {
+            if (res.success) {
+
+              this.root.querySelector('#result').innerHTML = res.status;
+
+              const projects = store.getState().projects; // eslint-disable-line no-undef
+
+              projects.push({
+                project_name: title,
+                connection_info: {
+                  host: dbhost,
+                  port,
+                  database,
+                  user,
+                  password: pass,
+                },
+              });
+
+              store.setState({ projects }); // eslint-disable-line no-undef
+            } else {
+              this.root.querySelector('.container').classList.add('shake');
+              this.root.querySelector('.container').classList.add('animated');
+              throw res.error;
+            }
+          })
+          .catch((err) => {
+            this.root.querySelector('#result').innerHTML = `Something went: ${err}`;
           });
-
-
-          console.log(db_host + user + pass);
-
-        });        
+      });
     }
-
   });
 })();
-
-
 </script>
