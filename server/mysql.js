@@ -153,7 +153,7 @@ async function extractSchema(project) {
   connection.destroy();
 
   // Concatenate the original project information with the new tables & stats
-  return { project, tables, stats };
+  return Object.assign({}, project, { tables, stats });
 }
 
 module.exports = {
