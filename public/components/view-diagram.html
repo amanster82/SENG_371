@@ -92,6 +92,10 @@
       box-shadow: var(--shadow);
     }
 
+    .export {
+      float: right;
+    }
+
   </style>
 
   <div class='diagram_view'>
@@ -111,6 +115,7 @@
         <button class='directed'>Force-Directed</button>
         <button class='circular'>Circular</button>
         <button class='digraph'>Layered Digraph</button>
+        <button class='export'>Export</button>
       </div>
     </div>
   </div>
@@ -238,6 +243,13 @@
 
           this.state.layout = 'directed';
           this.update();
+        });
+
+        this.root.querySelector('.export').addEventListener('click', () => {
+
+          const data = this.diagram.makeImageData();
+
+          window.open(data, '_blank');
         });
 
         // Event handler for leaving this page
