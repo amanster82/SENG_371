@@ -137,7 +137,8 @@
 
         // Store state about this diagram view
         this.state = {
-          layout: 'directed'
+          layout: 'directed',
+          hidden: []
         };
 
         // Fade-in handler
@@ -153,6 +154,7 @@
         this.update();
       }
 
+      // Return current layout being used
       get layout() {
 
         switch (this.state.layout) {
@@ -191,7 +193,7 @@
 
           for (const column of table.columns) {
 
-            items.push({ name: column.column_name, iskey: false, figure: 'Decision', color: this.brushes.yellowgrad });
+            items.push({ name: column.column_name, iskey: false, figure: 'Decision', color: '#009688' });
           }
 
           nodes.push({ key: table.table_name, items });
@@ -250,6 +252,52 @@
         });
       }
 
+      hideNode(e, button) {
+
+        // Get key for root node
+        const key = button.part.data.key;
+
+        // Find node by key and make invisible
+        this.diagram.findNodeForKey(key).visible = false;
+      }
+
+      // Search for related nodes and make them visible + bring into view
+      bringRelatedNodesIntoView(e, button) {
+
+        const key = button.part.data.key;
+
+        this.diagram.findNodeForKey(key).isInDocumentBounds = true;
+
+        for (const table of this.props.tables) {
+
+          for (const relation of table.relationships) {
+
+            // External node that has a relation to ours
+            if (relation.referenced_table_name === key) {
+
+              const node = this.diagram.findNodeForKey(relation.table_name);
+
+              node.visible = true;
+              node.isInDocumentBounds = true;
+              node.location = new go.Point(0, 0);
+            }
+
+            // Our node has a relation to an external node
+            if (relation.table_name === key) {
+
+              const node = this.diagram.findNodeForKey(table.table_name);
+
+              node.visible = true;
+              node.isInDocumentBounds = true;
+              node.location = new go.Point(0, 0);
+            }
+          }
+        }
+
+        // Force a re-layout
+        this.diagram.layout.invalidateLayout();
+      }
+
       initializeDiagram() {
 
         // If the diagram already exists, overwrite the container div
@@ -292,83 +340,79 @@
             'Auto',
             {
               selectionAdorned: true,
-              resizable: true,
+              resizable: false,
               fromSpot: go.Spot.AllSides,
               toSpot: go.Spot.AllSides,
               isShadowed: true,
               shadowColor: '#C5C1AA'
             },
             new go.Binding('location', 'location').makeTwoWay(),
-            $(go.Shape, 'RoundedRectangle', { fill: this.brushes.lightblue, stroke: '#756875', strokeWidth: 3 }),
+            $(go.Shape, 'Rectangle', { fill: this.brushes.lightblue, stroke: '#756875', strokeWidth: 3 }),
             $(go.Panel, 'Table',
-              { margin: 8, stretch: go.GraphObject.Fill },
+              {
+                stretch: go.GraphObject.Fill
+              },
               $(go.RowColumnDefinition, { row: 0, sizing: go.RowColumnDefinition.None }),
-              $(go.TextBlock,
-                {
-                  row: 0,
-                  alignment: go.Spot.Center,
-                  margin: new go.Margin(0, 14, 0, 2),
-                  font: 'bold 16px sans-serif'
-                },
-                new go.Binding('text', 'key')
-              ),
-              $('PanelExpanderButton', 'LIST', { row: 0, alignment: go.Spot.TopRight }),
-              $(go.Panel, 'Vertical',
-                $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: null }),
-                {
-                  name: 'LIST',
-                  row: 1,
-                  padding: 3,
-                  alignment: go.Spot.TopLeft,
-                  defaultAlignment: go.Spot.Left,
-                  stretch: go.GraphObject.Horizontal,
-                  itemTemplate: this.itemTemplate
-                },
-                new go.Binding('itemArray', 'items')
-              )
-            ) // End table panel
-          ); // End template
-
-          this.diagram.nodeTemplate = $(go.Node,
-            'Auto',
-            {
-              selectionAdorned: true,
-              resizable: true,
-              fromSpot: go.Spot.AllSides,
-              toSpot: go.Spot.AllSides,
-              isShadowed: true,
-              shadowColor: '#C5C1AA'
-            },
-            new go.Binding('location', 'location').makeTwoWay(),
-            $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: '#756875', strokeWidth: 3 }),
-            $(go.Panel, 'Vertical',
               $(go.Panel, 'Auto',
-                { stretch: go.GraphObject.Horizontal },
-                $(go.Shape, { fill: this.brushes.lightblue, stroke: null }),
-                $(go.TextBlock,
-                  {
-                    row: 0,
-                    alignment: go.Spot.Center,
-                    margin: new go.Margin(5, 20, 5, 20),
-                    font: 'bold 16px sans-serif'
-                  },
-                  new go.Binding('text', 'key')
-                ),
-                $('PanelExpanderButton', 'LIST', { row: 0, alignment: go.Spot.TopRight })
+                { row: 0 },
+                $(go.Shape, {
+                  fill: this.brushes.lightblue,
+                  stroke: null,
+                  stretch: go.GraphObject.Horizontal
+                }),
+                $(go.Panel, 'Horizontal', {},
+                  $(go.TextBlock,
+                    {
+                      name: 'LIST',
+                      alignment: go.Spot.Center,
+                      margin: new go.Margin(5, 20, 5, 20),
+                      font: 'bold 16px sans-serif',
+                      stretch: go.GraphObject.Horizontal
+                    },
+                    new go.Binding('text', 'key')
+                  ),
+                  $('Button',
+                    {
+                      click: (e, button) => this.hideNode(e, button),
+                      alignment: go.Spot.TopRight
+                    },
+                    $(go.TextBlock, 'X',
+                      { font: 'bold 10pt sans-serif', desiredSize: new go.Size(15, 15), textAlign: 'center' }
+                    )
+                  ),
+                  $('Button',
+                    {
+                      click: (e, button) => this.bringRelatedNodesIntoView(e, button),
+                      alignment: go.Spot.TopRight
+                    },
+                    $(go.TextBlock, '+',
+                      { font: 'bold 10pt sans-serif', desiredSize: new go.Size(15, 15), textAlign: 'center' }
+                    )
+                  )
+                )
               ),
-              $(go.Panel, 'Vertical',
-                { margin: new go.Margin(5) },
-                $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: null }),
-                {
-                  name: 'LIST',
-                  row: 1,
-                  padding: 3,
-                  alignment: go.Spot.TopLeft,
-                  defaultAlignment: go.Spot.Left,
-                  stretch: go.GraphObject.Horizontal,
-                  itemTemplate: this.itemTemplate
-                },
-                new go.Binding('itemArray', 'items')
+              $(go.Panel, 'Table',
+                { row: 1, stretch: go.GraphObject.Horizontal },
+                $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: null, stretch: go.GraphObject.Fill, row: 0 }),
+                $(go.Panel, 'Vertical',
+                  { margin: new go.Margin(5), row: 0, stretch: go.GraphObject.Horizontal },
+                  $('PanelExpanderButton', 'LIST2', { alignment: go.Spot.TopRight })
+                ),
+                $(go.Panel, 'Auto', { row: 1, name: 'LIST2', stretch: go.GraphObject.Fill },
+                  $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: null, stretch: go.GraphObject.Fill }),
+                  $(go.Panel, 'Vertical',
+                    {},
+                    {
+                      name: 'LIST2',
+                      padding: 3,
+                      alignment: go.Spot.TopLeft,
+                      defaultAlignment: go.Spot.Left,
+                      stretch: go.GraphObject.Horizontal,
+                      itemTemplate: this.itemTemplate
+                    },
+                    new go.Binding('itemArray', 'items')
+                  )
+                )
               )
             )
           ); // End template
