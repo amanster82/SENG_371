@@ -278,7 +278,7 @@
 
         const key = button.part.data.key;
 
-        this.diagram.findNodeForKey(key).isInDocumentBounds = true;
+        const primaryNode = this.diagram.findNodeForKey(key);
 
         for (const table of this.props.tables) {
 
@@ -290,8 +290,7 @@
               const node = this.diagram.findNodeForKey(relation.table_name);
 
               node.visible = true;
-              node.isInDocumentBounds = true;
-              node.location = new go.Point(0, 0);
+              //node.move(primaryNode.location);
             }
 
             // Our node has a relation to an external node
@@ -300,11 +299,13 @@
               const node = this.diagram.findNodeForKey(table.table_name);
 
               node.visible = true;
-              node.isInDocumentBounds = true;
-              node.location = new go.Point(0, 0);
+              //node.move(primaryNode.location);
             }
           }
         }
+
+        // The move function will bring all related nodes close to this one and into view
+        primaryNode.move(primaryNode.location);
 
         // Force a re-layout
         this.diagram.layout.invalidateLayout();
