@@ -376,8 +376,7 @@
       }
 
       getProjectIndex() {
-        return store.getState().projects.findIndex(el =>
-          el.project_name === this.props.project_name);
+        return this.props.index;
       }
     });
   })();
