@@ -6,20 +6,19 @@
     :host {
       opacity: 1;
       position: absolute;
-      background: #E0F2F1;
       height: 100%;
       width: 100%;
       display: flex;
       align-items: center;
       transition: var(--long-transition);
       z-index: 2;
+      background: rgba(0, 0, 0, 0.5);
     }
 
     .container{
       margin: 0 auto;
       transform: scale3d(1, 1, 1);
       overflow: hidden;
-
     } 
     
 		#content {
@@ -28,6 +27,7 @@
       text-align: center;
       padding: 1em;
       box-shadow: var(--shadow);
+      box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
 		
 		}
 
@@ -112,6 +112,16 @@
       background-color: var(--background-teal);
       color: white;
     }
+
+    #result{
+      font-size: 15px;
+    }
+
+    @media(min-width: 768px){
+      #content {
+        margin-top: 1em;
+      }
+    }
     
 	</style>
 	
@@ -122,7 +132,7 @@
   <div class="container" id="container">
     <div id="content">
     <h1> Connect to a Database </h1>
-    <i class="fa fa-plug fa-5x" aria-hidden="true" style="margin-bottom: 10px;"></i>
+    <i id="plug" class="fa fa-plug fa-5x" aria-hidden="true" style="margin-bottom: 10px;"></i>
     <div class="box" style="padding-top: 20px;">
       <form>
         <div class="group">
@@ -160,15 +170,13 @@
           <span class="highlight"></span> 
           <span class="bar"></span> 
           <label>Password</label>
+
           <button id="submit" onsubmit="return false"> Submit </button>
         </div>
+          
       </form>
-
-      <div id="result"></div>
-   
-
           <button id="back">back</button>
-      
+          <div id="result"></div>
       </div>
     </div>
   </div>
@@ -241,8 +249,10 @@
 
           .then((res) => {
             if (res.success) {
-
+              this.root.querySelector('#plug').style.color = 'green';
+              this.root.querySelector('#result').style.color = 'green';
               this.root.querySelector('#result').innerHTML = res.status;
+
 
               const projects = store.getState().projects; // eslint-disable-line no-undef
 
@@ -257,15 +267,41 @@
                 },
               });
 
+              setTimeout(() => {
+
+                this.root.querySelector('.container').classList.add('bounceOutDown');
+                this.root.querySelector('.container').classList.add('animated');
+
+              }, 0);
+
+              setTimeout(() => {
+                this.className = '';
+                this.classList.add('cpRemove');
+              }, 1000);
+
+              setTimeout(() => {
+                this.remove();
+              }, 1800);
+
+
               store.setState({ projects }); // eslint-disable-line no-undef
             } else {
               this.root.querySelector('.container').classList.add('shake');
               this.root.querySelector('.container').classList.add('animated');
+
+              setTimeout(() => {
+                this.root.querySelector('.container').classList.remove('shake');
+                this.root.querySelector('.container').classList.remove('animated');
+              }, 800);
+
               throw res.error;
             }
+
           })
           .catch((err) => {
-            this.root.querySelector('#result').innerHTML = `Something went: ${err}`;
+            this.root.querySelector('#plug').style.color = 'red';
+            this.root.querySelector('#result').style.color = 'red';
+            this.root.querySelector('#result').innerHTML = `${err}`;
           });
       });
     }
