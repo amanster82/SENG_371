@@ -247,7 +247,9 @@
 
         this.root.querySelector('.export').addEventListener('click', () => {
 
-          const data = this.diagram.makeImageData();
+          const serialized = new XMLSerializer().serializeToString(this.diagram.makeSvg({scale: 1}))
+
+          const data = `data:image/svg+xml;base64,${window.btoa(serialized)}`;
 
           window.open(data, '_blank');
         });
