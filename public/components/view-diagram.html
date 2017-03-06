@@ -230,8 +230,9 @@
         if (x === 0) {
         // Initializes the goJS canvas and templates
           this.initializeDiagram();
+        } else {
+          this.abstractDiagram();
         }
-        this.abstractDiagram();
       }
 
       assignButtonHandlers() {
@@ -335,54 +336,56 @@
         this.diagram.layout.invalidateLayout();
       }
 
-      initializeDiagram() {
+// Getters
+      get linkTemplate() { // eslint-disable-line class-methods-use-this
+        return $(go.Link,
+          {
+            selectionAdorned: true,
+            layerName: 'Foreground',
+            reshapable: true,
+            routing: go.Link.AvoidsNodes,
+            corner: 5,
+            curve: go.Link.JumpOver
+          },
 
-        // If the diagram already exists, overwrite the container div
-        if (this.diagram) {
-          this.root.querySelector('.diagram_lane').innerHTML = "<div class='diagram_container'></div>";
-        }
+            $(go.Shape, { stroke: '#303B45', strokeWidth: 2.5 }),
 
-        setTimeout(() => {
-
-          // Initialize the goJS canvas
-          this.diagram = $(go.Diagram,
-            this.root.querySelector('.diagram_container'),
+              $(go.TextBlock,
+                {
+                  textAlign: 'center',
+                  font: 'bold 14px sans-serif',
+                  stroke: '#1967B3',
+                  segmentIndex: 0,
+                  segmentOffset: new go.Point(NaN, NaN),
+                  segmentOrientation: go.Link.OrientUpright
+                },
+              new go.Binding('text', 'text')
+              ),
+          $(go.TextBlock,
             {
-              initialContentAlignment: go.Spot.Center,
-              allowDelete: false,
-              allowCopy: false,
-              layout: this.layout,
-              'undoManager.isEnabled': true,
-            }
-          );
-
-          this.itemTemplate = $(go.Panel,
-            'Horizontal',
-            $(go.Shape,
-              { desiredSize: new go.Size(10, 10) },
-              new go.Binding('figure', 'figure'),
-              new go.Binding('fill', 'color')
-            ),
-            $(go.TextBlock,
-              {
-                stroke: '#333333',
-                font: 'bold 14px sans-serif',
-                margin: new go.Margin(0, 0, 0, 5),
-              },
-              new go.Binding('text', 'name')
-            )
-          );
-
-          this.diagram.nodeTemplate = $(go.Node,
-            'Auto',
-            {
-              selectionAdorned: true,
-              resizable: false,
-              fromSpot: go.Spot.AllSides,
-              toSpot: go.Spot.AllSides,
-              isShadowed: true,
-              shadowColor: '#C5C1AA'
+              textAlign: 'center',
+              font: 'bold 14px sans-serif',
+              stroke: '#1967B3',
+              segmentIndex: -1,
+              segmentOffset: new go.Point(NaN, NaN),
+              segmentOrientation: go.Link.OrientUpright
             },
+            new go.Binding('text', 'toText')
+          ) // End textblock
+        ); // End template
+      }
+
+      get nodeTemplate() {
+        return $(go.Node,
+            'Auto',
+          {
+            selectionAdorned: true,
+            resizable: false,
+            fromSpot: go.Spot.AllSides,
+            toSpot: go.Spot.AllSides,
+            isShadowed: true,
+            shadowColor: '#C5C1AA'
+          },
             new go.Binding('location', 'location').makeTwoWay(),
             $(go.Shape, 'Rectangle', { fill: this.brushes.lightblue, stroke: '#756875', strokeWidth: 3 }),
             $(go.Panel, 'Table',
@@ -435,17 +438,16 @@
                   { margin: new go.Margin(5), row: 0, stretch: go.GraphObject.Horizontal },
                   $('PanelExpanderButton', 'LIST2', { alignment: go.Spot.TopRight })
                 ),
-                $(go.Panel, 'Auto', { row: 1, name: 'LIST2', stretch: go.GraphObject.Fill },
+                $(go.Panel, 'Auto', { row: 1, name: 'LIST2', stretch: go.GraphObject.Fill, visible: false },
                   $(go.Shape, 'Rectangle', { fill: this.brushes.white, stroke: null, stretch: go.GraphObject.Fill }),
                   $(go.Panel, 'Vertical',
                     {},
                     {
-                      name: 'LIST2',
                       padding: 3,
                       alignment: go.Spot.TopLeft,
                       defaultAlignment: go.Spot.Left,
                       stretch: go.GraphObject.Horizontal,
-                      itemTemplate: this.itemTemplate
+                      itemTemplate: this.itemTemplate,
                     },
                     new go.Binding('itemArray', 'items')
                   )
@@ -453,73 +455,30 @@
               )
             )
           ); // End template
+      }
 
-          this.diagram.linkTemplate = $(go.Link,
-            {
-              selectionAdorned: true,
-              layerName: 'Foreground',
-              reshapable: true,
-              routing: go.Link.AvoidsNodes,
-              corner: 5,
-              curve: go.Link.JumpOver
-            },
-            $(go.Shape, { stroke: '#303B45', strokeWidth: 2.5 }),
-            $(go.TextBlock,
-              {
-                textAlign: 'center',
-                font: 'bold 14px sans-serif',
-                stroke: '#1967B3',
-                segmentIndex: 0,
-                segmentOffset: new go.Point(NaN, NaN),
-                segmentOrientation: go.Link.OrientUpright
-              },
-              new go.Binding('text', 'text')
+      get itemTemplate() { // eslint-disable-line class-methods-use-this
+        return $(go.Panel,
+            'Horizontal',
+            $(go.Shape,
+              { desiredSize: new go.Size(10, 10) },
+              new go.Binding('figure', 'figure'),
+              new go.Binding('fill', 'color')
             ),
             $(go.TextBlock,
               {
-                textAlign: 'center',
+                stroke: '#333333',
                 font: 'bold 14px sans-serif',
-                stroke: '#1967B3',
-                segmentIndex: -1,
-                segmentOffset: new go.Point(NaN, NaN),
-                segmentOrientation: go.Link.OrientUpright
+                margin: new go.Margin(0, 0, 0, 5),
               },
-              new go.Binding('text', 'toText')
-            ) // End textblock
-          ); // End template
-
-          const entities = this.entityNodes; // This is a function call
-
-          this.diagram.model = new go.GraphLinksModel(entities.nodes, entities.relationships);
-
-        }, 10);
+              new go.Binding('text', 'name')
+            )
+          );
       }
 
-      abstractDiagram() {
-        const nodeDataArray = [
-          { key: 'R1', group: 'AE1' },
-          { key: 'R2', group: 'AE1' },
-          { key: 'R3', group: 'AE1' },
-          { key: 'R4', group: 'AE1' },
-          { key: 'R6', group: 'AE1' },
-          { key: 'R7', group: 'AE1' },
-          { key: 'R8', group: 'AE1' },
-          { key: 'AE1', isGroup: true },
-          { key: 'R4', group: 'AE2' },
-          { key: 'R5', group: 'AE2' },
-          { key: 'R10', group: 'AE2' },
-          { key: 'AE2', isGroup: true },
-          { key: 'R7', group: 'AE3' },
-          { key: 'R9', group: 'AE3' },
-          { key: 'R11', group: 'AE3' },
-          { key: 'AE3', isGroup: true },
-        ];
-        const linkDataArray = [
-          { from: 'AE1', to: 'AE2' },
-          { from: 'AE2', to: 'AE3' },
-        ];
+      initializeDiagram() {
 
-         // If the diagram already exists, overwrite the container div
+        // If the diagram already exists, overwrite the container div
         if (this.diagram) {
           this.root.querySelector('.diagram_lane').innerHTML = "<div class='diagram_container'></div>";
         }
@@ -538,35 +497,118 @@
             }
           );
 
+          this.diagram.itemTemplate = this.itemTemplate;
+          this.diagram.nodeTemplate = this.nodeTemplate;
+          this.diagram.linkTemplate = this.linkTemplate;
+          const entities = this.entityNodes; // This is a function call
+          this.diagram.model = new go.GraphLinksModel(entities.nodes, entities.relationships);
+
+        }, 10);
+      }
+
+      abstractDiagram() {
+        const nodeDataArray = [
+          { key: 'R1', group: 'AE1' },
+          { key: 'R2', group: 'AE1' },
+          { key: 'R3', group: 'AE1' },
+          { key: 'R6', group: 'AE1' },
+          { key: 'R7', group: 'AE1' },
+          { key: 'R8', group: 'AE1' },
+          { key: 'AE1', isGroup: true },
+          { key: 'R4', group: 'AE2' },
+          { key: 'R5', group: 'AE2' },
+          { key: 'R10', group: 'AE2' },
+          { key: 'AE2', isGroup: true, shape: 'Diamond' },
+          { key: 'R7', group: 'AE3' },
+          { key: 'R9', group: 'AE3' },
+          { key: 'R11', group: 'AE3' },
+          { key: 'AE3', isGroup: true },
+        ];
+        const linkDataArray = [
+          { from: 'AE1', to: 'AE2' },
+          { from: 'AE2', to: 'AE3' },
+        ];
+
+         // If the diagram already exists, overwrite the container div
+        if (this.diagram) {
+          this.root.querySelector('.diagram_lane').innerHTML = "<div class='diagram_container'></div>";
+        }
+
+        setTimeout(() => {
+          // Initialize the goJS canvas
+          this.diagram = $(go.Diagram,
+            this.root.querySelector('.diagram_container'),
+            {
+              initialContentAlignment: go.Spot.Center,
+              allowDelete: false,
+              allowCopy: false,
+              layout: this.layout,
+              'undoManager.isEnabled': true,
+            }
+          );
 
           this.diagram.nodeTemplate =
             $(go.Node, 'Auto',
-            $(go.Shape, 'Rectangle', { fill: 'white' }),
-            $(go.TextBlock,
-                new go.Binding('text', 'key')
-              )
+              { desiredSize: new go.Size(100, 50) },
+              $(go.Shape, 'Ellipse',
+                { fill: 'white', name: 'SHAPE', margin: 0 }
+              ),
+                $(go.TextBlock,
+                  new go.Binding('text', 'key')
+                ),
+                  $('Button',
+                    { alignment: go.Spot.TopRight, desiredSize: new go.Size(15, 15) },
+                    $(go.Shape, 'AsteriskLine'),
+                      { click: (e, obj) => this.changeCategory(e, obj) }
+                  )
             );
 
           this.diagram.groupTemplate =
-            $(go.Group, 'Auto', { isSubGraphExpanded: false, },
-            $(go.Shape, 'Rectangle',
-              { fill: null, stroke: 'gray', strokeWidth: 2 }),
-            $(go.Panel, 'Vertical',
-              { defaultAlignment: go.Spot.Left, margin: 4 },
-            $(go.Panel, 'Horizontal',
-                { defaultAlignment: go.Spot.Top },
+            $(go.Group, 'Auto',
+              { isSubGraphExpanded: false, },
+              $(go.Shape, 'Rectangle',
+                { fill: null, stroke: 'gray', strokeWidth: 2 },
+                new go.Binding('figure', 'shape')),
+                $(go.Panel, 'Vertical',
+                  { defaultAlignment: go.Spot.Right, margin: 4 },
+                  $(go.Panel, 'Horizontal',
+                    { defaultAlignment: go.Spot.Top },
                 // the SubGraphExpanderButton is a
                 // panel that functions as a button to expand or collapse the subGraph
-            $('SubGraphExpanderButton'),
-                $(go.TextBlock,
-                  { font: 'Bold 18px Sans-Serif', margin: 4 },
-                  new go.Binding('text', 'key'))
-              ),
-              // create a placeholder to represent the area where the contents of the group are
-            $(go.Placeholder,
-                { padding: new go.Margin(0, 10) })
-            )  // end Vertical Panel
-          );  // end Group
+                  $('SubGraphExpanderButton',
+                    { alignment: go.Spot.TopRight, desiredSize: new go.Size(15, 15) }
+                  ),
+                  $('Button',
+                    {
+                      click: (e, obj) => {
+                        const key = obj.part.data.key;
+                        const diagram = obj.diagram;
+                        const node = diagram.findNodeForKey(key);
+
+                        diagram.currentTool = diagram.toolManager.textEditingTool;
+
+                        diagram.toolManager.textEditingTool.textBlock = node.findObject('edit');
+                        diagram.toolManager.textEditingTool.doStart();
+                      },
+                      alignment: go.Spot.TopRight
+                    },
+
+                      $(go.TextBlock, '...',
+                        { font: 'bold 9pt sans-serif', desiredSize: new go.Size(9, 9), textAlign: 'center' }
+                      )
+                    )
+                  ),
+
+                  $(go.TextBlock,
+                    { editable: true, verticalAlignment: go.Spot.Center, font: 'Bold 20px Sans-Serif', name: 'edit' },
+                      new go.Binding('text', 'key')
+                    ),
+                  // create a placeholder to represent the area where the contents of the group are
+                  $(go.Placeholder,
+                    { padding: new go.Margin(0, 10) }
+                  )
+                )  // end Vertical Panel
+              );  // end Group
 
           this.diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
         }, 10);
