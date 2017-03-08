@@ -126,7 +126,7 @@
         <button class='circular'>Circular</button>
         <button class='digraph'>Layered Digraph</button>
         <div class='divider'></div>
-        <button class='clustered'>Abstract View</button>
+        <button class='abstract'>Abstract View</button>
         <button class='export'>Export</button>
       </div>
     </div>
@@ -229,37 +229,38 @@
       update(x) {
         if (x === 0) {
         // Initializes the goJS canvas and templates
-          this.initializeDiagram();
+          this.initializeDiagram(0);
         } else {
-          this.abstractDiagram();
+          this.initializeDiagram(1);
         }
       }
 
       assignButtonHandlers() {
 
+        let signal = 0;
+
         this.root.querySelector('.grid').addEventListener('click', () => {
 
           this.state.layout = 'grid';
-
-          this.update(0);
+          this.update(signal);
         });
 
         this.root.querySelector('.circular').addEventListener('click', () => {
 
           this.state.layout = 'circular';
-          this.update(0);
+          this.update(signal);
         });
 
         this.root.querySelector('.digraph').addEventListener('click', () => {
 
           this.state.layout = 'digraph';
-          this.update(0);
+          this.update(signal);
         });
 
         this.root.querySelector('.directed').addEventListener('click', () => {
 
           this.state.layout = 'directed';
-          this.update(0);
+          this.update(signal);
         });
 
         this.root.querySelector('.export').addEventListener('click', () => {
@@ -273,8 +274,9 @@
           window.open(data, '_blank');
         });
 
-        this.root.querySelector('.clustered').addEventListener('click', () => {
-          this.update(1);
+        this.root.querySelector('.abstract').addEventListener('click', () => {
+          signal = 1;
+          this.update(signal);
         });
 
         // Event handler for leaving this page
@@ -476,7 +478,101 @@
           );
       }
 
-      initializeDiagram() {
+      get abstractNodeTemplate() { // eslint-disable-line class-methods-use-this
+        return $(go.Node, 'Auto',
+              { desiredSize: new go.Size(100, 50) },
+              $(go.Shape, 'Ellipse',
+                { fill: 'white', name: 'SHAPE', margin: 0 }
+              ),
+                $(go.TextBlock,
+                  new go.Binding('text', 'key')
+                ),
+                  $('Button',
+                    { alignment: go.Spot.TopRight, desiredSize: new go.Size(15, 15) },
+                    $(go.Shape, 'AsteriskLine'),
+                      { click: (e, obj) => this.changeCategory(e, obj) }
+                  )
+                );
+      }
+
+
+      get abstractGroupTemplate() { // eslint-disable-line class-methods-use-this
+        return $(go.Group, 'Auto',
+        { isSubGraphExpanded: false, },
+        $(go.Shape, 'Rectangle',
+          { fill: null, stroke: 'gray', strokeWidth: 2 },
+          new go.Binding('figure', 'shape')),
+          $(go.Panel, 'Vertical',
+            { defaultAlignment: go.Spot.Right, margin: 4 },
+            $(go.Panel, 'Horizontal',
+              { defaultAlignment: go.Spot.Top },
+          // the SubGraphExpanderButton is a
+          // panel that functions as a button to expand or collapse the subGraph
+            $('SubGraphExpanderButton',
+              { alignment: go.Spot.TopRight, desiredSize: new go.Size(15, 15) }
+            ),
+            $('Button',
+              {
+                click: (e, obj) => {
+                  const key = obj.part.data.key;
+                  const diagram = obj.diagram;
+                  const node = diagram.findNodeForKey(key);
+
+                  diagram.currentTool = diagram.toolManager.textEditingTool;
+
+                  diagram.toolManager.textEditingTool.textBlock = node.findObject('edit');
+                  diagram.toolManager.textEditingTool.doStart();
+                },
+                alignment: go.Spot.TopRight
+              },
+
+                $(go.TextBlock, '...',
+                  { font: 'bold 9pt sans-serif', desiredSize: new go.Size(9, 9), textAlign: 'center' }
+                )
+              )
+            ),
+
+            $(go.TextBlock,
+              { editable: true, verticalAlignment: go.Spot.Center, font: 'Bold 20px Sans-Serif', name: 'edit' },
+                new go.Binding('text', 'key')
+              ),
+            // create a placeholder to represent the area where the contents of the group are
+            $(go.Placeholder,
+              { padding: new go.Margin(0, 10) }
+            )
+          )  // end Vertical Panel
+        );  // end Group
+      }
+
+      get stuntData() { // eslint-disable-line class-methods-use-this
+
+        const nodeDataArray = [
+          { key: 'R1', group: 'AE1' },
+          { key: 'R2', group: 'AE1' },
+          { key: 'R3', group: 'AE1' },
+          { key: 'R6', group: 'AE1' },
+          { key: 'R7', group: 'AE1' },
+          { key: 'R8', group: 'AE1' },
+          { key: 'AE1', isGroup: true },
+          { key: 'R4', group: 'AE2' },
+          { key: 'R5', group: 'AE2' },
+          { key: 'R10', group: 'AE2' },
+          { key: 'AE2', isGroup: true, shape: 'Diamond' },
+          { key: 'R7', group: 'AE3' },
+          { key: 'R9', group: 'AE3' },
+          { key: 'R11', group: 'AE3' },
+          { key: 'AE3', isGroup: true },
+        ];
+
+        const linkDataArray = [
+          { from: 'AE1', to: 'AE2' },
+          { from: 'AE2', to: 'AE3' },
+        ];
+
+        return { nodeDataArray, linkDataArray };
+      }
+
+      initializeDiagram(view) {
 
         // If the diagram already exists, overwrite the container div
         if (this.diagram) {
@@ -497,122 +593,23 @@
             }
           );
 
-          this.diagram.itemTemplate = this.itemTemplate;
-          this.diagram.nodeTemplate = this.nodeTemplate;
-          this.diagram.linkTemplate = this.linkTemplate;
-          const entities = this.entityNodes; // This is a function call
-          this.diagram.model = new go.GraphLinksModel(entities.nodes, entities.relationships);
+          if (view === 0) {
+            this.diagram.itemTemplate = this.itemTemplate;
+            this.diagram.nodeTemplate = this.nodeTemplate;
+            this.diagram.linkTemplate = this.linkTemplate;
+            const entities = this.entityNodes; // This is a function call
+            this.diagram.model = new go.GraphLinksModel(entities.nodes, entities.relationships);
+          } else {
+            this.diagram.nodeTemplate = this.nodeTemplate;
+            this.diagram.groupTemplate = this.abstractGroupTemplate;
+            const stuntData = this.stuntData;
+            this.diagram.model =
+              new go.GraphLinksModel(stuntData.nodeDataArray, stuntData.linkDataArray);
+          }
 
         }, 10);
       }
 
-      abstractDiagram() {
-        const nodeDataArray = [
-          { key: 'R1', group: 'AE1' },
-          { key: 'R2', group: 'AE1' },
-          { key: 'R3', group: 'AE1' },
-          { key: 'R6', group: 'AE1' },
-          { key: 'R7', group: 'AE1' },
-          { key: 'R8', group: 'AE1' },
-          { key: 'AE1', isGroup: true },
-          { key: 'R4', group: 'AE2' },
-          { key: 'R5', group: 'AE2' },
-          { key: 'R10', group: 'AE2' },
-          { key: 'AE2', isGroup: true, shape: 'Diamond' },
-          { key: 'R7', group: 'AE3' },
-          { key: 'R9', group: 'AE3' },
-          { key: 'R11', group: 'AE3' },
-          { key: 'AE3', isGroup: true },
-        ];
-        const linkDataArray = [
-          { from: 'AE1', to: 'AE2' },
-          { from: 'AE2', to: 'AE3' },
-        ];
-
-         // If the diagram already exists, overwrite the container div
-        if (this.diagram) {
-          this.root.querySelector('.diagram_lane').innerHTML = "<div class='diagram_container'></div>";
-        }
-
-        setTimeout(() => {
-          // Initialize the goJS canvas
-          this.diagram = $(go.Diagram,
-            this.root.querySelector('.diagram_container'),
-            {
-              initialContentAlignment: go.Spot.Center,
-              allowDelete: false,
-              allowCopy: false,
-              layout: this.layout,
-              'undoManager.isEnabled': true,
-            }
-          );
-
-          this.diagram.nodeTemplate =
-            $(go.Node, 'Auto',
-              { desiredSize: new go.Size(100, 50) },
-              $(go.Shape, 'Ellipse',
-                { fill: 'white', name: 'SHAPE', margin: 0 }
-              ),
-                $(go.TextBlock,
-                  new go.Binding('text', 'key')
-                ),
-                  $('Button',
-                    { alignment: go.Spot.TopRight, desiredSize: new go.Size(15, 15) },
-                    $(go.Shape, 'AsteriskLine'),
-                      { click: (e, obj) => this.changeCategory(e, obj) }
-                  )
-            );
-
-          this.diagram.groupTemplate =
-            $(go.Group, 'Auto',
-              { isSubGraphExpanded: false, },
-              $(go.Shape, 'Rectangle',
-                { fill: null, stroke: 'gray', strokeWidth: 2 },
-                new go.Binding('figure', 'shape')),
-                $(go.Panel, 'Vertical',
-                  { defaultAlignment: go.Spot.Right, margin: 4 },
-                  $(go.Panel, 'Horizontal',
-                    { defaultAlignment: go.Spot.Top },
-                // the SubGraphExpanderButton is a
-                // panel that functions as a button to expand or collapse the subGraph
-                  $('SubGraphExpanderButton',
-                    { alignment: go.Spot.TopRight, desiredSize: new go.Size(15, 15) }
-                  ),
-                  $('Button',
-                    {
-                      click: (e, obj) => {
-                        const key = obj.part.data.key;
-                        const diagram = obj.diagram;
-                        const node = diagram.findNodeForKey(key);
-
-                        diagram.currentTool = diagram.toolManager.textEditingTool;
-
-                        diagram.toolManager.textEditingTool.textBlock = node.findObject('edit');
-                        diagram.toolManager.textEditingTool.doStart();
-                      },
-                      alignment: go.Spot.TopRight
-                    },
-
-                      $(go.TextBlock, '...',
-                        { font: 'bold 9pt sans-serif', desiredSize: new go.Size(9, 9), textAlign: 'center' }
-                      )
-                    )
-                  ),
-
-                  $(go.TextBlock,
-                    { editable: true, verticalAlignment: go.Spot.Center, font: 'Bold 20px Sans-Serif', name: 'edit' },
-                      new go.Binding('text', 'key')
-                    ),
-                  // create a placeholder to represent the area where the contents of the group are
-                  $(go.Placeholder,
-                    { padding: new go.Margin(0, 10) }
-                  )
-                )  // end Vertical Panel
-              );  // end Group
-
-          this.diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
-        }, 10);
-      }
     });
   })();
 </script>
