@@ -286,30 +286,58 @@
         this.initializeDiagram();
       }
 
+      invalidateLayout() {
+
+        const projects = store.getState().projects;
+        const project = projects[this.props.index];
+
+        let i;
+
+        for (i = 0; i < project.groups.length; i += 1) {
+
+          delete project.groups[i].location;
+          project.groups[i].isLayoutPositioned = true;
+        }
+
+        for (i = 0; i < project.tables.length; i += 1) {
+
+          delete project.tables[i].location;
+          project.tables[i].isLayoutPositioned = true;
+        }
+
+        store.setState({ // eslint-disable-line no-undef
+          projects,
+        }, { suppressUpdate: true });
+      }
+
       assignButtonHandlers() {
 
         this.root.querySelector('.grid').addEventListener('click', () => {
 
           this.state.layout = 'grid';
-          this.update(signal);
+          this.invalidateLayout();
+          this.update();
         });
 
         this.root.querySelector('.circular').addEventListener('click', () => {
 
           this.state.layout = 'circular';
-          this.update(signal);
+          this.invalidateLayout();
+          this.update();
         });
 
         this.root.querySelector('.digraph').addEventListener('click', () => {
 
           this.state.layout = 'digraph';
-          this.update(signal);
+          this.invalidateLayout();
+          this.update();
         });
 
         this.root.querySelector('.directed').addEventListener('click', () => {
 
           this.state.layout = 'directed';
-          this.update(signal);
+          this.invalidateLayout();
+          this.update();
         });
 
         this.root.querySelector('.export').addEventListener('click', () => {
@@ -676,6 +704,10 @@
 
                 const index = groups.findIndex(grp => grp.group_name === key);
 
+                if (index === -1) {
+                  return;
+                }
+
                 if (loc.x || loc.y) {
                   groups[index].location = `${loc.x} ${loc.y}`;
                 } else {
@@ -687,6 +719,10 @@
                 const tables = project.tables;
 
                 const index = tables.findIndex(tbl => tbl.table_name === key);
+
+                if (index === -1) {
+                  return;
+                }
 
                 if (loc.x || loc.y) {
                   tables[index].location = `${loc.x} ${loc.y}`;
