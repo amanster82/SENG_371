@@ -1,5 +1,6 @@
 /* eslint-disable camelcase, no-restricted-syntax */
 const mysql = require('mysql');
+const clusterEntities = require('./cluster');
 
 /**
  * Will perform a MySQL connection for the given project and connection info
@@ -87,6 +88,7 @@ async function extractSchema(project) {
     table_count: 0,
     column_count: 0,
     relationship_count: 0,
+    group_count: 0,
   };
 
   const table_query = await promisifyQuery(connection, 'show tables');
@@ -149,11 +151,37 @@ async function extractSchema(project) {
     stats.table_count += 1;
   }
 
+  stats.aeCount = 0;
+  stats.arCount = 0;
+
+  let groups = [];
+
+  try {
+    groups = clusterEntities(tables)[1].map((group, i) => {
+
+      if (group[0].type === 'AE') {
+        stats.aeCount += 1;
+      } else {
+        stats.arCount += 1;
+      }
+
+      return {
+        group_id: i,
+        group_name: `${group[0].type}${group[0].type === 'AE' ? stats.aeCount : stats.arCount}`,
+        type: group[0].type,
+        tables: group,
+      };
+    });
+
+  } catch (e) {
+    groups = [];
+  }
+
   // Connection must be destroyed as per the specification of the getConnection() function
   connection.destroy();
 
   // Concatenate the original project information with the new tables & stats
-  return Object.assign({}, project, { tables, stats });
+  return Object.assign({}, project, { tables, groups, stats });
 }
 
 module.exports = {
