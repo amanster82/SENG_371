@@ -241,11 +241,12 @@
 
         const groups = this.props.groups || [];
         const relationships = [];
-        const nodes = [];
+        let nodes = [];
 
         for (const group of groups) {
 
           const items = [];
+          const tables = [];
 
           for (const table of group.tables) {
 
@@ -254,10 +255,12 @@
               items.push({ name: column.column_name, iskey: column.attributes.indexOf('PK') !== -1, figure: 'Decision', color: '#009688' });
             }
 
-            nodes.push({ key: table.table_name, group: group.group_name, items });
+            tables.push({ key: table.table_name, group: group.group_name, items });
           }
 
-          const node = { key: group.group_name, isGroup: true };
+          nodes = nodes.concat(tables);
+
+          const node = { key: group.group_name, isGroup: true, tables };
           if (group.location) {
             node.location = group.location;
             node.isLayoutPositioned = false;
@@ -581,7 +584,16 @@
         return $(go.Group, 'Auto',
         new go.Binding('location', 'location', go.Point.parse).makeTwoWay(go.Point.stringify),
         new go.Binding('isLayoutPositioned', 'isLayoutPositioned'),
-        { isSubGraphExpanded: false, },
+          {
+            isSubGraphExpanded: false,
+            subGraphExpandedChanged: (obj) => {
+              if (obj.isSubGraphExpanded) {
+                obj.findObject('LISTNODES').visible = false; // eslint-disable-line no-param-reassign
+              } else {
+                obj.findObject('LISTNODES').visible = true;// eslint-disable-line no-param-reassign
+              }
+            }
+          },
         $(go.Shape, 'Rectangle',
           { fill: null, stroke: 'gray', strokeWidth: 2 },
           new go.Binding('figure', 'shape')),
@@ -601,6 +613,21 @@
                   const diagram = obj.diagram;
                   const node = diagram.findNodeForKey(key);
 
+                  node.isSubGraphExpanded = false;
+                  node.findObject('LISTNODES').visible = true;
+                }
+              },
+              $(go.TextBlock, 'List',
+                { font: 'bold 9pt sans-serif', desiredSize: new go.Size(40, 11), textAlign: 'center' }
+              )
+            ),
+            $('Button',
+              {
+                click: (e, obj) => {
+                  const key = obj.part.data.key;
+                  const diagram = obj.diagram;
+                  const node = diagram.findNodeForKey(key);
+
                   diagram.currentTool = diagram.toolManager.textEditingTool;
 
                   diagram.toolManager.textEditingTool.textBlock = node.findObject('edit');
@@ -609,15 +636,63 @@
                 alignment: go.Spot.TopRight
               },
 
-                $(go.TextBlock, '...',
-                  { font: 'bold 9pt sans-serif', desiredSize: new go.Size(9, 9), textAlign: 'center' }
+                $(go.TextBlock, 'Name',
+                  { font: 'bold 9pt sans-serif', desiredSize: new go.Size(40, 11), textAlign: 'center' }
                 )
               )
             ),
 
             $(go.TextBlock,
-              { editable: true, verticalAlignment: go.Spot.Center, font: 'Bold 20px Sans-Serif', name: 'edit' },
+              { stretch: go.GraphObject.Fill, editable: true, verticalAlignment: go.Spot.Center, font: 'Bold 20px Sans-Serif', name: 'edit' },
                 new go.Binding('text', 'key')
+              ),
+              $(go.Panel, 'Vertical', { name: 'LISTNODES', stretch: go.GraphObject.Fill, visible: true, alignment: go.Spot.TopLeft },
+                {
+                  itemTemplate: $(go.Panel, 'Vertical', $(go.Panel,
+                    'Horizontal',
+                    { stretch: go.GraphObject.Fill },
+                    $(go.Shape,
+                      {
+                        desiredSize: new go.Size(10, 10),
+                        figure: 'Rectangle',
+                        fill: '#009688'
+                      }
+                    ),
+                    $(go.TextBlock,
+                      {
+                        font: 'bold 14px sans-serif',
+                        margin: new go.Margin(5, 5, 5, 5)
+                      },
+                      new go.Binding('text', 'key')
+                    ),
+                    $('PanelExpanderButton', 'LISTNODEITEMS', { alignment: go.Spot.TopRight })
+                  ),
+                  $(go.Panel, 'Vertical', { name: 'LISTNODEITEMS', stretch: go.GraphObject.Fill, visible: false, alignment: go.Spot.TopLeft },
+                    {
+                      itemTemplate: $(go.Panel,
+                        'Horizontal',
+                        { stretch: go.GraphObject.Fill },
+                        $(go.Shape,
+                          {
+                            desiredSize: new go.Size(10, 10),
+                            figure: 'Decision',
+                            fill: '#009688'
+                          }
+                        ),
+                        $(go.TextBlock,
+                          {
+                            font: 'bold 14px sans-serif',
+                            margin: new go.Margin(5, 5, 5, 5),
+                          },
+                          new go.Binding('text', 'name')
+                        )
+                        ),
+                      margin: new go.Margin(0, 0, 0, 10),
+                    },
+                  new go.Binding('itemArray', 'items'))
+                  )
+                },
+                new go.Binding('itemArray', 'tables')
               ),
             // create a placeholder to represent the area where the contents of the group are
             $(go.Placeholder,
@@ -625,34 +700,6 @@
             )
           )  // end Vertical Panel
         );  // end Group
-      }
-
-      get stuntData() { // eslint-disable-line class-methods-use-this
-
-        const nodeDataArray = [
-          { key: 'R1', group: 'AE1' },
-          { key: 'R2', group: 'AE1' },
-          { key: 'R3', group: 'AE1' },
-          { key: 'R6', group: 'AE1' },
-          { key: 'R7', group: 'AE1' },
-          { key: 'R8', group: 'AE1' },
-          { key: 'AE1', isGroup: true },
-          { key: 'R4', group: 'AE2' },
-          { key: 'R5', group: 'AE2' },
-          { key: 'R10', group: 'AE2' },
-          { key: 'AE2', isGroup: true, shape: 'Diamond' },
-          { key: 'R7', group: 'AE3' },
-          { key: 'R9', group: 'AE3' },
-          { key: 'R11', group: 'AE3' },
-          { key: 'AE3', isGroup: true },
-        ];
-
-        const linkDataArray = [
-          { from: 'AE1', to: 'AE2' },
-          { from: 'AE2', to: 'AE3' },
-        ];
-
-        return { nodeDataArray, linkDataArray };
       }
 
       initializeDiagram() {
@@ -740,7 +787,7 @@
           this.diagram.addDiagramListener('TextEdited', (e) => {
 
             const key = e.subject.part.data.key;
-            const new_name = e.subject.text;
+            const newName = e.subject.text;
 
             const projects = store.getState().projects;
             const project = projects[this.props.index];
@@ -749,7 +796,7 @@
 
             const index = groups.findIndex(grp => grp.group_name === key);
 
-            groups[index].group_name = new_name;
+            groups[index].group_name = newName;
 
             store.setState({ // eslint-disable-line no-undef
               projects,
