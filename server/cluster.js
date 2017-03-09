@@ -11,8 +11,7 @@ function removeTable(list, table) {
 // Only columns with primary keys are checked
 function pk(R) {
 
-    return R.columns;
-    //return R.columns.filter(col => col.attributes.indexOf('PK') !== -1);
+    return R.columns.filter(col => col.attributes.indexOf('PK') !== -1);
 }
 
 // Return a list of column names from a list of column objects
@@ -41,8 +40,7 @@ function orderAscPk(rels) {
 function steponetwo(entities) {
 
     // Pull only the entities that have at least 1 primary key
-    // const rels = entities.filter(rel => rel.columns.some(col => col.attributes.indexOf('PK') !== -1));
-    const rels = entities;
+    const rels = entities.filter(rel => rel.columns.some(col => col.attributes.indexOf('PK') !== -1));
 
     const cluster = [];
     let disjoint = false;
