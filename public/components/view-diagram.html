@@ -155,7 +155,8 @@
         // Store state about this diagram view
         this.state = {
           layout: 'directed',
-          hidden: []
+          hidden: [],
+          summarized: false,
         };
 
         // Fade-in handler
@@ -213,7 +214,16 @@
             items.push({ name: column.column_name, iskey: false, figure: 'Decision', color: '#009688' });
           }
 
-          nodes.push({ key: table.table_name, items });
+          const node = { key: table.table_name, items };
+
+          if (table.location) {
+            node.location = table.location;
+            node.isLayoutPositioned = false;
+          } else {
+            node.isLayoutPositioned = true;
+          }
+
+          nodes.push(node);
 
           for (const relation of table.relationships) {
 
@@ -248,6 +258,12 @@
           }
 
           const node = { key: group.group_name, isGroup: true };
+          if (group.location) {
+            node.location = group.location;
+            node.isLayoutPositioned = false;
+          } else {
+            node.isLayoutPositioned = true;
+          }
 
           if (group.type === 'AR') {
             node.shape = 'diamond';
@@ -260,20 +276,17 @@
       }
 
       // Update the diagram view if it has changes
-      update(x) {
-        if (x === 0) {
-        // Initializes the goJS canvas and templates
-          this.initializeDiagram(0);
+      update() {
+        if (this.state.summarized === false) {
           this.root.querySelector('.abstract').innerHTML = 'Cluster';
         } else {
-          this.initializeDiagram(1);
           this.root.querySelector('.abstract').innerHTML = 'Disjoin';
         }
+
+        this.initializeDiagram();
       }
 
       assignButtonHandlers() {
-
-        let signal = 0;
 
         this.root.querySelector('.grid').addEventListener('click', () => {
 
@@ -312,13 +325,9 @@
 
         this.root.querySelector('.abstract').addEventListener('click', () => {
 
-          if (signal === 0) {
-            signal = 1;
-            this.update(signal);
-          } else {
-            signal = 0;
-            this.update(signal);
-          }
+          this.state.summarized = !this.state.summarized;
+
+          this.update();
 
         });
 
@@ -429,9 +438,10 @@
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
             isShadowed: true,
-            shadowColor: '#C5C1AA'
+            shadowColor: '#C5C1AA',
           },
-            new go.Binding('location', 'location').makeTwoWay(),
+            new go.Binding('location', 'location', go.Point.parse).makeTwoWay(go.Point.stringify),
+            new go.Binding('isLayoutPositioned', 'isLayoutPositioned'),
             $(go.Shape, 'Rectangle', { fill: this.brushes.lightblue, stroke: '#756875', strokeWidth: 3 }),
             $(go.Panel, 'Table',
               {
@@ -541,6 +551,8 @@
 
       get abstractGroupTemplate() { // eslint-disable-line class-methods-use-this
         return $(go.Group, 'Auto',
+        new go.Binding('location', 'location', go.Point.parse).makeTwoWay(go.Point.stringify),
+        new go.Binding('isLayoutPositioned', 'isLayoutPositioned'),
         { isSubGraphExpanded: false, },
         $(go.Shape, 'Rectangle',
           { fill: null, stroke: 'gray', strokeWidth: 2 },
@@ -615,7 +627,7 @@
         return { nodeDataArray, linkDataArray };
       }
 
-      initializeDiagram(view) {
+      initializeDiagram() {
 
         // If the diagram already exists, overwrite the container div
         if (this.diagram) {
@@ -636,7 +648,7 @@
             }
           );
 
-          if (view === 0) {
+          if (!this.state.summarized) {
             this.diagram.itemTemplate = this.itemTemplate;
             this.diagram.nodeTemplate = this.nodeTemplate;
             this.diagram.linkTemplate = this.linkTemplate;
@@ -648,6 +660,46 @@
             const entities = this.entityGroups;
             this.diagram.model = new go.GraphLinksModel(entities.nodes, entities.relationships);
           }
+
+          this.diagram.addDiagramListener('SelectionMoved', () => {
+
+            Object.values(this.diagram.selection.pd).forEach((obj) => {
+
+              const key = obj.value.part.data.key;
+              const loc = obj.value.part.data.location;
+
+              const projects = store.getState().projects;
+              const project = projects[this.props.index];
+
+              if (this.state.summarized) {
+                const groups = project.groups;
+
+                const index = groups.findIndex(grp => grp.group_name === key);
+
+                if (loc.x || loc.y) {
+                  groups[index].location = `${loc.x} ${loc.y}`;
+                } else {
+                  groups[index].location = loc;
+                }
+
+              } else {
+
+                const tables = project.tables;
+
+                const index = tables.findIndex(tbl => tbl.table_name === key);
+
+                if (loc.x || loc.y) {
+                  tables[index].location = `${loc.x} ${loc.y}`;
+                } else {
+                  tables[index].location = loc;
+                }
+              }
+
+              store.setState({ // eslint-disable-line no-undef
+                projects,
+              }, { suppressUpdate: true });
+            });
+          });
 
         }, 10);
       }

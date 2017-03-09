@@ -250,7 +250,7 @@
       updateContent() {
         if (!this.props.page || this.props.page === 'rename') {
 
-          if (!this.props.tables || this.props.tables === 0) {
+          if (!this.props.tables || this.props.tables === 0 || !this.props.groups) {
             this.root.querySelector('#content').innerHTML =
               'Project is loading...';
           } else if (this.props.stats) {
@@ -324,7 +324,7 @@
       updateSchema() {
 
         // Need to pull schema from server since we're missing the information
-        if (!this.props.tables || this.props.tables.length === 0) {
+        if (!this.props.tables || this.props.tables.length === 0 || !this.props.groups) {
           fetch(`${window.location}mysql/extract`, {
             method: 'POST',
             body: JSON.stringify(this.props),

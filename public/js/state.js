@@ -50,7 +50,7 @@ function createStore(initialState) {
   }
 
   // Will update the state and trigger all listener callbacks
-  function setState(newState) {
+  function setState(newState, options) {
 
     // Merge the new state into the current state non-destructively
     currentState = Object.assign({}, currentState, newState);
@@ -58,6 +58,10 @@ function createStore(initialState) {
     // Persist to localStorage
     if (useLocalStorage) {
       localStorage.setItem(storageKey, JSON.stringify(currentState));
+    }
+
+    if (options && options.suppressUpdate === true) {
+      return;
     }
 
     // Copy the listeners to avoid mutation during iteration
