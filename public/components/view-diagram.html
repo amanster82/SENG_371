@@ -737,6 +737,25 @@
             });
           });
 
+          this.diagram.addDiagramListener('TextEdited', (e) => {
+
+            const key = e.subject.part.data.key;
+            const new_name = e.subject.text;
+
+            const projects = store.getState().projects;
+            const project = projects[this.props.index];
+
+            const groups = project.groups;
+
+            const index = groups.findIndex(grp => grp.group_name === key);
+
+            groups[index].group_name = new_name;
+
+            store.setState({ // eslint-disable-line no-undef
+              projects,
+            }, { suppressUpdate: true });
+          });
+
         }, 10);
       }
 
