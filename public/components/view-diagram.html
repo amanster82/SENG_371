@@ -126,7 +126,7 @@
         <button class='circular'>Circular</button>
         <button class='digraph'>Layered Digraph</button>
         <div class='divider'></div>
-        <button class='abstract'>Abstract View</button>
+        <button class='abstract'>Cluster/Disjoin</button>
         <button class='export'>Export</button>
       </div>
     </div>
@@ -230,8 +230,10 @@
         if (x === 0) {
         // Initializes the goJS canvas and templates
           this.initializeDiagram(0);
+          this.root.querySelector('.abstract').innerHTML = 'Cluster';
         } else {
           this.initializeDiagram(1);
+          this.root.querySelector('.abstract').innerHTML = 'Disjoin';
         }
       }
 
@@ -275,8 +277,15 @@
         });
 
         this.root.querySelector('.abstract').addEventListener('click', () => {
-          signal = 1;
-          this.update(signal);
+
+          if (signal === 0) {
+            signal = 1;
+            this.update(signal);
+          } else {
+            signal = 0;
+            this.update(signal);
+          }
+
         });
 
         // Event handler for leaving this page
