@@ -237,11 +237,16 @@
       /**
         * Converts data structure to group view
         */
+
       get entityGroups() {
 
         const groups = this.props.groups || [];
         const relationships = [];
+        const arKeys = [];
+        const groupKeys = [];
+        const temp = [];
         let nodes = [];
+        
 
         for (const group of groups) {
 
@@ -270,8 +275,56 @@
 
           if (group.type === 'AR') {
             node.shape = 'diamond';
-          }
 
+            for (var i=0; i<=group.tables.length-1; i++) {  
+              arKeys.push(group.tables[i].columns[i].column_name);
+              for (const group of groups) {
+                for (const table of group.tables) {
+                  groupKeys.push({name: group.group_name, key: table.columns[0].column_name});
+                }
+              }
+            }
+
+            for (const groupKey of groupKeys) {
+                 const key = groupKey.key;
+                 const name= groupKey.name;
+              //   console.log("name", name);
+                // console.log("temp", temp);
+
+              for(const arKey of arKeys) {
+                  //console.log("arkey", arKey);
+                  //console.log("key", key);
+
+                if (arKey == key && temp.length==0) {
+                  temp.push(name); 
+                  continue;
+                }
+                
+                let found = false;
+                if (arKey != key || name == group.group_name  ) {
+                  continue;
+                }
+                for (var x=0; x<=temp.length-1; x++) {
+
+                  if (temp[x] === name) {
+                    found = true;
+                    break;
+                  }
+                }
+
+                if (found == false) {
+                    temp.push(name);
+                }      
+              }      
+            }
+
+        // Draw Relationship Lines  
+            for(var j=0; j<=temp.length-1; j++){
+                 relationships.push({from: temp[j],  to: group.group_name}); 
+            }
+            
+          }
+        
           nodes.push(node);
         }
 
@@ -646,7 +699,7 @@
               { stretch: go.GraphObject.Fill, editable: true, verticalAlignment: go.Spot.Center, font: 'Bold 20px Sans-Serif', name: 'edit' },
                 new go.Binding('text', 'key')
               ),
-              $(go.Panel, 'Vertical', { name: 'LISTNODES', stretch: go.GraphObject.Fill, visible: true, alignment: go.Spot.TopLeft },
+              $(go.Panel, 'Vertical', { name: 'LISTNODES', stretch: go.GraphObject.Fill, visible: false, alignment: go.Spot.TopLeft },
                 {
                   itemTemplate: $(go.Panel, 'Vertical', $(go.Panel,
                     'Horizontal',
@@ -702,6 +755,11 @@
         );  // end Group
       }
 
+      get abstractLinkTemplate(){ // eslint-disable-line class-methods-use-this
+       return $(go.Link,       // the whole link panel
+                $(go.Shape));  // the link shape, default black stroke
+      }
+
       initializeDiagram() {
 
         // If the diagram already exists, overwrite the container div
@@ -732,6 +790,7 @@
           } else {
             this.diagram.nodeTemplate = this.nodeTemplate;
             this.diagram.groupTemplate = this.abstractGroupTemplate;
+            this.diagram.linkTemplate = this.abstractLinkTemplate;
             const entities = this.entityGroups;
             this.diagram.model = new go.GraphLinksModel(entities.nodes, entities.relationships);
           }
