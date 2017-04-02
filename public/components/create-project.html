@@ -142,6 +142,12 @@
           <label>Project Title</label>
         </div>
         <div class="group">
+          <input id="src" placeholder="Optional" type="text"> 
+          <span class="highlight"></span> 
+          <span class="bar"></span>
+          <label>Source Code Path</label>
+        </div>  
+        <div class="group">
           <input id="db_host" required="" type="text"> 
           <span class="highlight"></span> 
           <span class="bar"></span>
@@ -223,6 +229,7 @@
 
         const title = this.root.querySelector('#title').value;
         const dbhost = this.root.querySelector('#db_host').value;
+        const src = this.root.querySelector('#src').value;
         const port = this.root.querySelector('#port').value;
         const database = this.root.querySelector('#schema').value;
         const user = this.root.querySelector('#user').value;
@@ -239,6 +246,7 @@
               user,
               password: pass,
             },
+            source_directory: src,
           }),
           headers: {
             'content-type': 'application/json',
