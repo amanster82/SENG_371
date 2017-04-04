@@ -914,12 +914,12 @@
             //  this.state.drillIn = false;
           }
 
-        /*  this.diagram.addDiagramListener('SelectionMoved', () => {
+          this.diagram.addDiagramListener('SelectionMoved', () => {
 
-            Object.values(this.diagram.selection.pd).forEach((obj) => {
+            this.diagram.selection.each((obj) => {
 
-              const key = obj.value.part.data.key;
-              const loc = obj.value.part.data.location;
+              const key = obj.data.key;
+              const loc = obj.data.location;
 
               const projects = store.getState().projects;
               const project = projects[this.props.index];
@@ -960,7 +960,7 @@
                 projects,
               }, { suppressUpdate: true });
             });
-          }); */
+          });
 
           this.diagram.addDiagramListener('TextEdited', (e) => {
 
