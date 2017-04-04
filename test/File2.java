@@ -111,7 +111,7 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
     
     @ManyToOne(fetch=FetchType.EAGER, targetEntity=LookupListItem.class)
     @JoinColumn(name="appointmentInstructions", referencedColumnName="value", insertable = false, updatable = false)
-    private LookupListItem lookupListItem;
+    private LookupListItem LookupListItem;
     
 	@Override
     public Integer getId() {

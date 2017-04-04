@@ -55,7 +55,7 @@ function parseJavaFile(data) {
           tableName = inner.match(ExtractString)[1] || 'unnamed_table';
         } else if (type === 'JoinColumn') {
 
-          const RipAnnotation = /([\w]+)[\s]+=[\s+]"([\w]+)"/mg;
+          const RipAnnotation = /([\w]+)[\s]*=[\s]*"([\w]+)"/mg;
           const keys = {};
 
           let key;
@@ -129,8 +129,6 @@ function parseCode(directory, schema) {
 
                   schema.stats.relationship_count += 1;
                 }
-
-                console.log(table.relationships);
               }
             }
           }
@@ -142,7 +140,6 @@ function parseCode(directory, schema) {
 
       resolve();
     });
-
   });
 }
 

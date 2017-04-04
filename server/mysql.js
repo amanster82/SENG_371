@@ -151,6 +151,26 @@ async function extractSchema(project) {
     stats.table_count += 1;
   }
 
+  // Reconcilliate FK attributes based on new found columns & relations
+
+  for (const table of tables) {
+    for (const relation of table.relationships) {
+
+      const tblIndex = tables.findIndex(tbl => tbl.table_name === relation.table_name);
+
+      if (tblIndex !== -1) {
+        const colIdx = tables[tblIndex].columns.findIndex(col =>
+          col.column_name === relation.column_name);
+
+        if (colIdx !== -1) {
+          if (tables[tblIndex].columns[colIdx].attributes.indexOf('FK') === -1) {
+            tables[tblIndex].columns[colIdx].attributes.push('FK');
+          }
+        }
+      }
+    }
+  }
+
   stats.aeCount = 0;
   stats.arCount = 0;
 
