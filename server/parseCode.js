@@ -106,12 +106,12 @@ function parseCode(directory, schema) {
                     column_id: table.columns.length,
                     coiumn_name: relation.column_name,
                     type: 'int',
-                    attributes: ['FK'],
+                    attributes: ['FKC'],
                   });
 
                   schema.stats.column_count += 1;
                 } else {
-                  table.columns[columnIdx].attributes.push('FK');
+                  table.columns[columnIdx].attributes.push('FKC');
                 }
 
                 const relationIdx = table.relationships.findIndex(rel =>

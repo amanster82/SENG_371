@@ -214,7 +214,23 @@
 
           for (const column of table.columns) {
 
-            items.push({ name: column.column_name, iskey: false, figure: 'Decision', color: '#009688' });
+            let figure = 'Decision';
+            let color = '#009688';
+
+            if (column.attributes.indexOf('FK') !== -1) {
+              figure = 'FivePointedStar';
+              color = 'yellow';
+            } else if (column.attributes.indexOf('FKC') !== -1) {
+              figure = 'FivePointedStar';
+              color = 'red';
+            }
+
+            items.push({
+              name: column.column_name,
+              iskey: false,
+              figure,
+              color,
+            });
           }
 
           const node = { key: table.table_name, items };
@@ -230,7 +246,9 @@
 
           for (const relation of table.relationships) {
 
-            relationships.push({ from: table.table_name, to: relation.table_name, text: '', toText: '' });
+            relationships.push({ from: relation.table_name, to: relation.referenced_table_name, text: '', toText: '' });
+
+            console.log(relation);
           }
         }
 

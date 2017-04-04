@@ -65,7 +65,7 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 
 	@ManyToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	@JoinColumn(name="specId")
-	private ProfessionalSpecialist professionalSpecialist;
+	private ProfessionalSpecialist professionalSpecialists;
 
 	@Temporal(TemporalType.DATE)
 	private Date appointmentDate;	
