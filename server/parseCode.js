@@ -104,7 +104,7 @@ function parseCode(directory, schema) {
                 if (columnIdx === -1) {
                   table.columns.push({
                     column_id: table.columns.length,
-                    coiumn_name: relation.column_name,
+                    column_name: relation.column_name,
                     type: 'int',
                     attributes: ['FKC'],
                   });
