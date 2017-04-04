@@ -5,21 +5,20 @@ const router = koaRouter();
 const fs = require('fs');
 
 const mysql = require('./mysql');
+const parser = require('./parseCode');
+
 /**
  * Returns a boolean with whether the given project object contains
  * all the fields necessary to facilitate a MySQL connection
  */
-function dirExists(dirPath)
-{
-    try
-    {
-        return fs.statSync(dirPath).isDirectory();
-    }
-    catch (err)
-    {
-        return false;
-    }
+function dirExists(dirPath) {
+  try {
+    return fs.statSync(dirPath).isDirectory();
+  } catch (err) {
+    return false;
+  }
 }
+
 function verifyProjectFields(project) {
 
   if (!project ||
@@ -30,12 +29,11 @@ function verifyProjectFields(project) {
     !project.connection_info.database) {
     return false;
   }
-  if(project.source_directory){
-    if(!dirExists(project.source_directory)){
+  if (project.source_directory) {
+    if (!dirExists(project.source_directory)) {
       return false;
     }
   }
-
 
   return true;
 }
@@ -54,7 +52,12 @@ router.post('/mysql/extract', async (ctx) => {
     return;
   }
 
-  ctx.body = await mysql.extractSchema(project);
+  const schema = await mysql.extractSchema(project);
+
+  await parser.parseCode(project.source_directory, schema);
+
+  ctx.body = '{}';
+  ctx.body = schema;
 });
 
 /**
