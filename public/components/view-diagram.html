@@ -481,15 +481,24 @@
 
         this.root.querySelector('.show').addEventListener('click', () => {
 
-          this.state.showAll = true;
-
-          if (this.state.showAll === true) {
+          if (this.state.showAll === false) {
+            this.root.querySelector('.show').innerHTML = 'Hide All';
             this.diagram.startTransaction('Expand');
             this.diagram.nodes.each((n) => {
               const p = n.findObject('LIST2');
               if (p !== null) p.visible = true;
             });
-            myDiagram.commitTransaction('open all panels');
+            this.diagram.commitTransaction('open all panels');
+            this.state.showAll = true;
+          } else {
+            this.root.querySelector('.show').innerHTML = 'Show All';
+            this.diagram.startTransaction('collapse');
+            this.diagram.nodes.each((n) => {
+              const p = n.findObject('LIST2');
+              if (p !== null) p.visible = false;
+              this.state.showAll = false;
+            });
+            this.diagram.commitTransaction('open all panels');
           }
         });
 
