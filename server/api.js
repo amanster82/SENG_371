@@ -56,7 +56,6 @@ router.post('/mysql/extract', async (ctx) => {
 
   await parser.parseCode(project.source_directory, schema);
 
-  ctx.body = '{}';
   ctx.body = schema;
 });
 

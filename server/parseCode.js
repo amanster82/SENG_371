@@ -55,7 +55,7 @@ function parseJavaFile(data) {
           tableName = inner.match(ExtractString)[1] || 'unnamed_table';
         } else if (type === 'JoinColumn') {
 
-          const RipAnnotation = /([\w]+)="([\w]+)"/mg;
+          const RipAnnotation = /([\w]+)[\s]+=[\s+]"([\w]+)"/mg;
           const keys = {};
 
           let key;
@@ -126,9 +126,6 @@ function parseCode(directory, schema) {
                     referenced_table_name: relation.referenced_table_name,
                     referenced_column_name: relation.referenced_column_name,
                   });
-
-                  console.log('adding');
-                  console.log(relation.referenced_table_name);
 
                   schema.stats.relationship_count += 1;
                 }
