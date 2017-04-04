@@ -127,6 +127,7 @@
         <button class='digraph'>Layered Digraph</button>
         <div class='divider'></div>
         <button class='abstract'>Cluster/Disjoin</button>
+        <button class='show'>Show All</button>
         <button class='export'>Export</button>
       </div>
     </div>
@@ -160,6 +161,7 @@
           Groupkey: '',
           summarized: false,
           drillIn: false,
+          showAll: false
         };
 
         // Fade-in handler
@@ -474,6 +476,21 @@
 
           this.update();
 
+        });
+
+
+        this.root.querySelector('.show').addEventListener('click', () => {
+
+          this.state.showAll = true;
+
+          if (this.state.showAll === true) {
+            this.diagram.startTransaction('Expand');
+            this.diagram.nodes.each((n) => {
+              const p = n.findObject('LIST2');
+              if (p !== null) p.visible = true;
+            });
+            myDiagram.commitTransaction('open all panels');
+          }
         });
 
         // Event handler for leaving this page
