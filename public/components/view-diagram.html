@@ -250,7 +250,6 @@
 
             relationships.push({ from: relation.table_name, to: relation.referenced_table_name, text: '', toText: '' });
 
-            console.log(relation);
           }
         }
 
@@ -397,6 +396,7 @@
           this.root.querySelector('.abstract').innerHTML = 'Disjoin';
           if (this.state.drillIn === true) {
             this.root.querySelector('.abstract').innerHTML = 'Drill Out';
+            this.state.summarized = true;
           }
         }
         this.initializeDiagram();
@@ -473,6 +473,7 @@
 
           if (this.state.drillIn === true) {
             this.state.drillIn = false;
+            this.state.summarized = true;
           }
 
           this.update();
@@ -938,7 +939,7 @@
             this.diagram.nodeTemplate = this.nodeTemplate;
             const entities = this.drillInNodes(this.state.Groupkey);
             this.diagram.model = new go.GraphLinksModel(entities.nodesWeWant);
-            //  this.state.drillIn = false;
+            this.state.summarized = true;
           }
 
           this.diagram.addDiagramListener('SelectionMoved', () => {
